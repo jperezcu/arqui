@@ -1,0 +1,5 @@
+timeout 7
+default 0
+
+title ChaviOS rc
+kernel /boot/kernel.bin
