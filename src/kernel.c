@@ -47,7 +47,7 @@ kmain() {
  Carga de IDT con rutinas de atenci—n IRQ
  *************************************************/
 
-void setup_IDT() {
+void setup_IDT_content() {
 	//	IRQ0: timer tick
 	setup_IDT_entry(&idt[0x08], 0x08, (dword) &_int_08_hand, ACS_INT, 0);
 	//	IRQ1: keyboard
@@ -83,6 +83,10 @@ void int_08() {
  *************************************************/
 
 void int_09(unsigned char scancode) {
-	char *video = (char *) 0xb8000;
-	video[tickpos += 2] = 'K';
+	struct key_type * key = (struct key_type *) parse_scancode(scancode);
+	if (key->kind == ALPHANUM_KEY) {
+		char *video = (char *) 0xb8000;
+		video[tickpos += 2] = key->ascii;
+	}
+
 }
