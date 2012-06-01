@@ -1,9 +1,11 @@
 GLOBAL  _read_msw,_lidt
 GLOBAL  _int_08_hand
+GLOBAL  _int_09_hand
 GLOBAL  _mascaraPIC1,_mascaraPIC2,_Cli,_Sti
 GLOBAL  _debug
 
 EXTERN  int_08
+EXTERN  int_09
 
 
 SECTION .text
@@ -39,7 +41,7 @@ _read_msw:
         retn
 
 
-_lidt:				; Carga el IDTR
+_lidt:					; Carga el IDTR
         push    ebp
         mov     ebp, esp
         push    ebx
@@ -51,21 +53,31 @@ _lidt:				; Carga el IDTR
         retn
 
 
-_int_08_hand:				; Handler de INT 8 ( Timer tick)
-        push    ds
-        push    es                      ; Se salvan los registros
-        pusha                           ; Carga de DS y ES con el valor del selector
-        mov     ax, 10h			; a utilizar.
-        mov     ds, ax
-        mov     es, ax                  
-        call    int_08                 
-        mov	al,20h			; Envio de EOI generico al PIC
-	out	20h,al
-	popa                            
-        pop     es
-        pop     ds
-        iret
+_int_08_hand:				; Handler de INT 8 (Timer tick)
 
+    pusha
+	call    int_08
+	jmp	EOI					; Envio de EOI generico al PIC
+
+_int_09_hand:				; Handler de INT 9 (Keyboard)
+
+	cli
+	pusha
+
+	in 	al, 60h
+	push 	eax
+	call	int_09
+	pop	eax
+
+	jmp	EOI					; Envio de EOI generico al PIC
+
+EOI:
+
+	mov	al,20h
+	out	20h,al
+	popa
+	sti
+	iret
 
 ; Debug para el BOCHS, detiene la ejecució; Para continuar colocar en el BOCHSDBG: set $eax=0
 ;
