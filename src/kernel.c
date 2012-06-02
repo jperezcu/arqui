@@ -6,11 +6,16 @@ IDTR idtr; /* IDTR */
 
 int tickpos = -2;
 
+struct keyboard_type keyboard;
+
 /* Definir‡ las entradas del IDT */
 void setup_IDT_content();
 
 /* Definir‡ el IDTR */
 void setup_IDTR();
+
+/* Definir‡ el teclado */
+void setup_keyboard();
 
 /**********************************************
  kmain()
@@ -23,6 +28,9 @@ kmain() {
 
 	/* Borra la pantalla. */
 	k_clear_screen();
+
+	/* Crea el teclado default */
+	setup_keyboard();
 
 	/* Carga de entradas en IDT */
 	setup_IDT_content();
@@ -68,24 +76,13 @@ void setup_IDTR() {
 }
 
 /**********************************************
- int_08()
- Atenci—n de interrupci—n del timer tick
+ setup_keyboard()
+ Inicializa el keyboard.
  *************************************************/
 
-void int_08() {
-//	char *video = (char *) 0xb8000;
-//	video[tickpos += 2] = 'o';
-}
-
-/**********************************************
- int_09()
- Atenci—n de interrupci—n del keyboard
- *************************************************/
-
-void int_09(unsigned char scancode) {
-	struct key_type * key = (struct key_type *) parse_scancode(scancode);
-	if (key->kind == ALPHANUM_KEY) {
-		char *video = (char *) 0xb8000;
-		video[tickpos += 2] = key->ascii;
-	}
+void setup_keyboard() {
+	keyboard.language = ENGLISH;
+	keyboard.state = LOWER;
+	keyboard.caps_state = FALSE;
+	keyboard.shift_state = FALSE;
 }

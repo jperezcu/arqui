@@ -58,17 +58,11 @@ typedef struct {
 
 /* keyboard */
 typedef struct keyboard_type {
-	int head;
-	int tail;
+	int language;
+	int state;
+	int caps_state;
 	int shift_state;
 	int alt_state;
-	int ctrl_state;
-	int caps_state;
-	int escaped_key;
-	int dead_key;
-	int num_state;
-	int scroll_state;
-	int language;
 	char buffer[KEYBOARD_BUFFER_SIZE];
 } keyboard_type;
 
