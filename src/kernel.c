@@ -4,7 +4,7 @@
 DESCR_INT idt[0xA]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
 
-int tickpos = 0;
+int tickpos = -2;
 
 /* Definir‡ las entradas del IDT */
 void setup_IDT_content();
@@ -73,8 +73,8 @@ void setup_IDTR() {
  *************************************************/
 
 void int_08() {
-	char *video = (char *) 0xb8000;
-	video[tickpos += 2] = 'o';
+//	char *video = (char *) 0xb8000;
+//	video[tickpos += 2] = 'o';
 }
 
 /**********************************************
@@ -88,5 +88,4 @@ void int_09(unsigned char scancode) {
 		char *video = (char *) 0xb8000;
 		video[tickpos += 2] = key->ascii;
 	}
-
 }

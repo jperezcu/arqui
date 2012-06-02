@@ -10,5 +10,6 @@
 
 int printable(unsigned char c);
 struct key_type * parse_scancode(unsigned char c);
+void change_language();
 
 #endif

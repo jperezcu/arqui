@@ -51,11 +51,9 @@ typedef struct {
 } IDTR;
 
 /* Tama–o de keyboard->buffer */
-
 #define KEYBOARD_BUFFER_SIZE	10
 
 /* Tama–o de shell->buffer */
-
 #define SHELL_BUFFER_SIZE	1024
 
 /* keyboard */
@@ -75,8 +73,19 @@ typedef struct keyboard_type {
 } keyboard_type;
 
 /* Keyboard->language posibles */
-#define ENGLISH	1
-#define SPANISH	2
+#define ENGLISH	0
+#define SPANISH	1
+
+#define LANGUAGES 2
+
+/* Keyboard states posibles */
+#define LOWER 0
+#define UPPER 1
+
+#define STATES 2
+
+/* Entradas en cada tabla de scancodes */
+#define KEYS 256
 
 /* key */
 typedef struct key_type {
@@ -89,7 +98,7 @@ typedef struct key_type {
 #define FUNCTION_KEY	2
 #define HIDDEN_KEY	3
 
-/* Keys especiales */
+/* Scancodes significativos */
 #define ALT_PRESSED	0x38
 #define ALT_RELEASED	0xb8
 #define ARROW_UP		0x48
