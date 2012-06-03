@@ -58,10 +58,42 @@ struct key_type * parse_scancode(unsigned char c) {
 	case ALT_RELEASED:
 		keyboard.alt_state = !keyboard.alt_state;
 		break;
+	case DEAD_KEY:
+		if (keyboard.dead_key == TRUE) {
+//			key->ascii = scancode_table[keyboard.language][keyboard.state][c];
+			key->ascii = '´';
+			keyboard.dead_key = FALSE;
+		} else if (keyboard.language == SPANISH){
+			keyboard.dead_key = TRUE;
+		}
+		break;
 	default:
+//		si es un key release, ignorar.
 		if (c & 0x80) {
 			key->ascii = 0;
+		} else if (keyboard.dead_key == TRUE && is_vowel(c)){
+
+			switch (c) {
+				case 0x12:
+					key->ascii = 'é';
+					break;
+				case 0x1e:
+					key->ascii = 'á';
+					break;
+				case 0x16:
+					key->ascii = 'ú';
+					break;
+				case 0x17:
+					key->ascii= 'í';
+					break;
+				case 0x18:
+					key->ascii= 'ó';
+					break;
+				}
+			keyboard.dead_key = FALSE;
+
 		} else {
+
 			if (printable(c)) {
 				key->kind = ALPHANUM_KEY;
 
@@ -70,6 +102,7 @@ struct key_type * parse_scancode(unsigned char c) {
 				} else {
 					keyboard.state = LOWER;
 				}
+
 			}
 
 			key->ascii = scancode_table[keyboard.language][keyboard.state][c];
@@ -83,5 +116,11 @@ int printable(unsigned char c) {
 			|| (c > 42 && c < 56) || c == 57 || c == 86) {
 		return TRUE;
 	}
+	return FALSE;
+}
+
+int is_vowel(unsigned char c){
+	if (c == 0x12 || c == 0x1e || c == 0x16 || c == 0x17 || c == 0x18)
+		return TRUE;
 	return FALSE;
 }

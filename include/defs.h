@@ -63,6 +63,7 @@ typedef struct keyboard_type {
 	int caps_state;
 	int shift_state;
 	int alt_state;
+	int dead_key;
 	char buffer[KEYBOARD_BUFFER_SIZE];
 } keyboard_type;
 

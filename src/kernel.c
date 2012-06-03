@@ -92,6 +92,7 @@ void setup_keyboard() {
 	keyboard.state = LOWER;
 	keyboard.caps_state = FALSE;
 	keyboard.shift_state = FALSE;
+	keyboard.dead_key = FALSE;
 }
 
 /**********************************************
