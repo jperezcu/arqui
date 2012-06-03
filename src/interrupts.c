@@ -26,7 +26,11 @@ void int_09(unsigned char scancode) {
 	case '\b':
 		del();
 		break;
+	case '\n':
+		skip_line();
+		break;
 	default:
 		break;
 	}
+	refresh_screen();
 }
