@@ -22,6 +22,7 @@ void print(char c) {
 }
 
 void del() {
+//	TODO escribo primer caracter, borro y no reemplaza el primer lugar por caracter vacio.
 
 	if (screen.video_pos != 0 && screen.line_pos != 0) {
 		screen.line_pos -= 2;

@@ -58,10 +58,10 @@ struct key_type * parse_scancode(unsigned char c) {
 	case ALT_RELEASED:
 		keyboard.alt_state = !keyboard.alt_state;
 		break;
-	case DEAD_KEY:
+	case 0x1a:
+// TODO lograr que entre a case DEAD KEY
 		if (keyboard.dead_key == TRUE) {
-//			key->ascii = scancode_table[keyboard.language][keyboard.state][c];
-			key->ascii = '´';
+			key->ascii = scancode_table[keyboard.language][keyboard.state][c];
 			keyboard.dead_key = FALSE;
 		} else if (keyboard.language == SPANISH){
 			keyboard.dead_key = TRUE;
