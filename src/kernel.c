@@ -7,6 +7,7 @@ IDTR idtr; /* IDTR */
 int tickpos = -2;
 
 struct keyboard_type keyboard;
+struct screen_type screen;
 
 /* Definir‡ las entradas del IDT */
 void setup_IDT_content();
@@ -16,6 +17,9 @@ void setup_IDTR();
 
 /* Definir‡ el teclado */
 void setup_keyboard();
+
+/* Definir‡ la pantalla */
+void setup_screen();
 
 /**********************************************
  kmain()
@@ -31,6 +35,9 @@ kmain() {
 
 	/* Crea el teclado default */
 	setup_keyboard();
+
+	/* Crea la pantalla*/
+		setup_screen();
 
 	/* Carga de entradas en IDT */
 	setup_IDT_content();
@@ -85,4 +92,14 @@ void setup_keyboard() {
 	keyboard.state = LOWER;
 	keyboard.caps_state = FALSE;
 	keyboard.shift_state = FALSE;
+}
+
+/**********************************************
+ setup_screen()
+ Inicializa la pantalla.
+ *************************************************/
+
+void setup_screen() {
+	screen.line_pos = 0;
+	screen.video_pos = 0;
 }

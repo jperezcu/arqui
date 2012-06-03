@@ -20,7 +20,13 @@ void int_08() {
 void int_09(unsigned char scancode) {
 	struct key_type * key = (struct key_type *) parse_scancode(scancode);
 	if (key->kind == ALPHANUM_KEY) {
-		char *video = (char *) 0xb8000;
-		video[tickpos += 2] = key->ascii;
+		print(key->ascii);
+	}
+	switch (key->ascii) {
+	case '\b':
+		del();
+		break;
+	default:
+		break;
 	}
 }

@@ -54,7 +54,7 @@ typedef struct {
 #define KEYBOARD_BUFFER_SIZE	10
 
 /* Tama–o de shell->buffer */
-#define SHELL_BUFFER_SIZE	1024
+#define LINE_BUFFER_SIZE	1024
 
 /* keyboard */
 typedef struct keyboard_type {
@@ -85,6 +85,7 @@ typedef struct keyboard_type {
 typedef struct key_type {
 	int kind;
 	unsigned char ascii;
+	unsigned char scancode;
 } key_type;
 
 /* Key->kind posibles */
@@ -99,7 +100,7 @@ typedef struct key_type {
 #define ARROW_LEFT		0x4b
 #define ARROW_RIGHT	0x4d
 #define ARROW_DOWN		0x50
-#define BACKSPACE		0x0e
+#define BACKSPACE		0x0d
 #define CAPSLOCK		0x3a
 #define CONTROL_PRESSED		0x1d
 #define CONTROL_RELEASED		0x9d
@@ -122,6 +123,16 @@ typedef struct key_type {
 #define SCROLLLOCK		0x46
 #define SPACE			0x39
 #define TABULAR		0x0f
+
+#define WIDTH 80
+#define HEIGHT 25
+
+typedef struct screen_type {
+	char video[WIDTH*HEIGHT*2];
+	char line_buffer[LINE_BUFFER_SIZE];
+	int line_pos;
+	int video_pos;
+} screen_type;
 
 #endif
 

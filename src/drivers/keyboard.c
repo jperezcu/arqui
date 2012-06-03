@@ -34,13 +34,17 @@ unsigned char scancode_table[LANGUAGES][STATES][KEYS] = { { { 0, 0x1b, '1', '2',
 
 struct key_type * parse_scancode(unsigned char c) {
 
+	key->scancode = c;
+
+	key->kind = HIDDEN_KEY;
+
 	switch (c) {
 	case CAPSLOCK:
 		keyboard.caps_state = !keyboard.caps_state;
 		break;
 	case LEFT_SHIFT_PRESSED:
 	case RIGHT_SHIFT_PRESSED:
-		if(keyboard.alt_state == TRUE){
+		if (keyboard.alt_state == TRUE) {
 			keyboard.language = !keyboard.language;
 		}
 	case LEFT_SHIFT_RELEASED:
@@ -48,7 +52,7 @@ struct key_type * parse_scancode(unsigned char c) {
 		keyboard.shift_state = !keyboard.shift_state;
 		break;
 	case ALT_PRESSED:
-		if(keyboard.shift_state == TRUE){
+		if (keyboard.shift_state == TRUE) {
 			keyboard.language = !keyboard.language;
 		}
 	case ALT_RELEASED:
@@ -56,37 +60,27 @@ struct key_type * parse_scancode(unsigned char c) {
 		break;
 	default:
 		if (c & 0x80) {
-			key->kind = HIDDEN_KEY;
+			key->ascii = 0;
 		} else {
 			if (printable(c)) {
 				key->kind = ALPHANUM_KEY;
-				if (keyboard.caps_state == TRUE && keyboard.shift_state == FALSE) {
+
+				if (keyboard.caps_state != keyboard.shift_state) {
 					keyboard.state = UPPER;
-				} else if (keyboard.caps_state == FALSE
-						&& keyboard.shift_state == TRUE) {
-					keyboard.state = UPPER;
-				} else if (keyboard.caps_state == TRUE
-						&& keyboard.shift_state == TRUE) {
-					keyboard.state = LOWER;
-				} else if (keyboard.caps_state == FALSE
-						&& keyboard.shift_state == FALSE) {
+				} else {
 					keyboard.state = LOWER;
 				}
-				key->ascii =
-						scancode_table[keyboard.language][keyboard.state][c];
 			}
+
+			key->ascii = scancode_table[keyboard.language][keyboard.state][c];
 		}
 	}
 	return key;
 }
 
-void change_language() {
-
-}
-
 int printable(unsigned char c) {
-	if ((c > 1 && c < 29) || (c > 29 && c < 42) || (c > 42 && c < 55) || c == 86
-			|| c == 57) {
+	if ((c > 1 && c < 14) || (c > 15 && c < 26) || (c > 29 && c < 42)
+			|| (c > 42 && c < 56) || c == 57 || c == 86) {
 		return TRUE;
 	}
 	return FALSE;
