@@ -100,24 +100,26 @@ void setup_keyboard() {
 
 void setup_vts() {
 	current_vt = 0;
-	int i;
+	int i, j;
 
-	screen_type screen;
-	for (i = 0; i < SCREEN_SIZE; i++) {
-		screen.content[i++] = 0;
-		screen.content[i] = WHITE_TXT;
+	for (j = 0; j < VT_AMOUNT; j++) {
+		screen_type screen;
+		for (i = 0; i < SCREEN_SIZE; i++) {
+			screen.content[i++] = 0;
+			screen.content[i] = WHITE_TXT;
+		}
+		screen.cursor = 0;
+
+		input_type input;
+		for (i = 0; i < INPUT_BUFFER_SIZE; i++) {
+			input.buffer[i++] = 0;
+			input.buffer[i] = WHITE_TXT;
+		}
+		input.cursor = 0;
+
+		vt_type term = { &screen, &input };
+		vt[j] = term;
 	}
-	screen.cursor = 0;
-
-	input_type input;
-	for (i = 0; i < INPUT_BUFFER_SIZE; i++) {
-		input.buffer[i++] = 0;
-		input.buffer[i] = WHITE_TXT;
-	}
-	input.cursor = 0;
-
-	vt_type term = { &screen, &input };
-	vt[0] = term;
 }
 
 void deb(unsigned char c) {

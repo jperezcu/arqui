@@ -128,7 +128,7 @@ typedef struct key_type {
 
 /* Pantalla */
 typedef struct screen_type {
-	char * content;
+	char content[SCREEN_SIZE];
 	int cursor;
 } screen_type;
 
@@ -137,7 +137,7 @@ typedef struct screen_type {
 
 /* input del usuario en terminal virtual */
 typedef struct input_type {
-	char * buffer;
+	char buffer[INPUT_BUFFER_SIZE];
 	int cursor;
 } input_type;
 
