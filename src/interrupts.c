@@ -35,5 +35,5 @@ void int_09(unsigned char scancode) {
 	default:
 		break;
 	}
-//	refresh_screen();
+	refresh_screen();
 }

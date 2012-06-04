@@ -6,7 +6,7 @@ IDTR idtr; /* IDTR */
 
 struct keyboard_type keyboard;
 int current_vt;
-struct vt_type vt[4];
+vt_type vt[4];
 
 /* Definir‡ las entradas del IDT */
 void setup_IDT_content();
@@ -102,21 +102,21 @@ void setup_vts() {
 	current_vt = 0;
 	int i;
 
-	struct screen_type screen;
+	screen_type screen;
 	for (i = 0; i < SCREEN_SIZE; i++) {
 		screen.content[i++] = 0;
 		screen.content[i] = WHITE_TXT;
 	}
 	screen.cursor = 0;
 
-	struct input_type input;
+	input_type input;
 	for (i = 0; i < INPUT_BUFFER_SIZE; i++) {
 		input.buffer[i++] = 0;
 		input.buffer[i] = WHITE_TXT;
 	}
 	input.cursor = 0;
 
-	struct vt_type term = { &screen, &input };
+	vt_type term = { &screen, &input };
 	vt[0] = term;
 }
 
