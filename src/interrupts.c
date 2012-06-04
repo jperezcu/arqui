@@ -18,6 +18,9 @@ void int_08() {
  *************************************************/
 
 void int_09(unsigned char scancode) {
+
+
+
 	struct key_type * key = (struct key_type *) parse_scancode(scancode);
 	if (key->kind == ALPHANUM_KEY) {
 		print(key->ascii);
@@ -32,5 +35,5 @@ void int_09(unsigned char scancode) {
 	default:
 		break;
 	}
-	refresh_screen();
+//	refresh_screen();
 }

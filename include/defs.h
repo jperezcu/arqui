@@ -33,33 +33,25 @@
 
 /* Descriptor de segmento */
 typedef struct {
-	word limit, base_l;
-	byte base_m, access, attribs, base_h;
+	word limit, base_l;byte base_m, access, attribs, base_h;
 } DESCR_SEG;
 
 /* Descriptor de interrupcion */
 typedef struct {
-	word offset_l, selector;
-	byte cero, access;
-	word offset_h;
+	word offset_l, selector;byte cero, access;word offset_h;
 } DESCR_INT;
 
 /* IDTR  */
 typedef struct {
-	word limit;
-	dword base;
+	word limit;dword base;
 } IDTR;
 
 /* Tama–o de keyboard->buffer */
 #define KEYBOARD_BUFFER_SIZE	10
 
-/* Tama–o de shell->buffer */
-#define LINE_BUFFER_SIZE	1024
-
-/* keyboard */
+/* Teclado */
 typedef struct keyboard_type {
 	int language;
-	int state;
 	int caps_state;
 	int shift_state;
 	int alt_state;
@@ -82,7 +74,7 @@ typedef struct keyboard_type {
 /* Entradas en cada tabla de scancodes */
 #define KEYS 256
 
-/* key */
+/* Tecla */
 typedef struct key_type {
 	int kind;
 	unsigned char ascii;
@@ -93,6 +85,8 @@ typedef struct key_type {
 #define ALPHANUM_KEY	1
 #define FUNCTION_KEY	2
 #define HIDDEN_KEY	3
+
+#define WHITE_TXT 0x07 // Atributo de video. Letras blancas, fondo negro
 
 /* Scancodes significativos */
 #define ALT_PRESSED	0x38
@@ -125,15 +119,36 @@ typedef struct key_type {
 #define SPACE			0x39
 #define TABULAR		0x0f
 
+/* Medidas de pantalla */
 #define WIDTH 80
 #define HEIGHT 25
+#define SCREEN_SIZE WIDTH*HEIGHT*2
+#define LAST_LINE_BEGIN WIDTH*(HEIGHT-1)*2
+#define LAST_LINE_END SCREEN_SIZE-1
 
+/* Pantalla */
 typedef struct screen_type {
-	char video[WIDTH*HEIGHT*2];
-	char line_buffer[LINE_BUFFER_SIZE];
-	int line_pos;
-	int video_pos;
+	char * content;
+	int cursor;
 } screen_type;
+
+/* Tama–o de shell->buffer */
+#define INPUT_BUFFER_SIZE	1024
+
+/* input del usuario en terminal virtual */
+typedef struct input_type {
+	char * buffer;
+	int cursor;
+} input_type;
+
+/* terminal virtual */
+typedef struct vt_type {
+	screen_type * screen;
+	input_type * input;
+} vt_type;
+
+/* Cantidad de terminales virtuales */
+#define VT_AMOUNT	4
 
 #endif
 

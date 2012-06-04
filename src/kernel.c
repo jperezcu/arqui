@@ -4,10 +4,9 @@
 DESCR_INT idt[0xA]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
 
-int tickpos = -2;
-
 struct keyboard_type keyboard;
-struct screen_type screen;
+int current_vt;
+struct vt_type vt[4];
 
 /* Definir‡ las entradas del IDT */
 void setup_IDT_content();
@@ -18,8 +17,8 @@ void setup_IDTR();
 /* Definir‡ el teclado */
 void setup_keyboard();
 
-/* Definir‡ la pantalla */
-void setup_screen();
+/* Definir‡ las terminales virtuales */
+void setup_vts();
 
 /**********************************************
  kmain()
@@ -37,7 +36,7 @@ kmain() {
 	setup_keyboard();
 
 	/* Crea la pantalla*/
-		setup_screen();
+	setup_vts();
 
 	/* Carga de entradas en IDT */
 	setup_IDT_content();
@@ -84,23 +83,46 @@ void setup_IDTR() {
 
 /**********************************************
  setup_keyboard()
- Inicializa el keyboard.
+ Inicializa el teclado.
  *************************************************/
 
 void setup_keyboard() {
 	keyboard.language = ENGLISH;
-	keyboard.state = LOWER;
 	keyboard.caps_state = FALSE;
 	keyboard.shift_state = FALSE;
 	keyboard.dead_key = FALSE;
 }
 
 /**********************************************
- setup_screen()
- Inicializa la pantalla.
+ setup_vts()
+ Inicializa las terminales virtuales.
  *************************************************/
 
-void setup_screen() {
-	screen.line_pos = 0;
-	screen.video_pos = 0;
+void setup_vts() {
+	current_vt = 0;
+	int i;
+
+	struct screen_type screen;
+	for (i = 0; i < SCREEN_SIZE; i++) {
+		screen.content[i++] = 0;
+		screen.content[i] = WHITE_TXT;
+	}
+	screen.cursor = 0;
+
+	struct input_type input;
+	for (i = 0; i < INPUT_BUFFER_SIZE; i++) {
+		input.buffer[i++] = 0;
+		input.buffer[i] = WHITE_TXT;
+	}
+	input.cursor = 0;
+
+	struct vt_type term = { &screen, &input };
+	vt[0] = term;
+}
+
+void deb(unsigned char c) {
+
+	char *monitor = (char *) 0xb8000;
+	monitor[1] = WHITE_TXT;
+	monitor[0] = c;
 }

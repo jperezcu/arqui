@@ -58,12 +58,12 @@ struct key_type * parse_scancode(unsigned char c) {
 	case ALT_RELEASED:
 		keyboard.alt_state = !keyboard.alt_state;
 		break;
-	case 0x1a:
-// TODO lograr que entre a case DEAD KEY
+	case DEAD_KEY:
 		if (keyboard.dead_key == TRUE) {
-			key->ascii = scancode_table[keyboard.language][keyboard.state][c];
+			key->ascii = '«';
+			key->kind = ALPHANUM_KEY;
 			keyboard.dead_key = FALSE;
-		} else if (keyboard.language == SPANISH){
+		} else if (keyboard.language == SPANISH) {
 			keyboard.dead_key = TRUE;
 		}
 		break;
@@ -71,41 +71,46 @@ struct key_type * parse_scancode(unsigned char c) {
 //		si es un key release, ignorar.
 		if (c & 0x80) {
 			key->ascii = 0;
-		} else if (keyboard.dead_key == TRUE && is_vowel(c)){
+		} else if (keyboard.dead_key == TRUE && is_vowel(c)) {
 
 			switch (c) {
-				case 0x12:
-					key->ascii = 'é';
-					break;
-				case 0x1e:
-					key->ascii = 'á';
-					break;
-				case 0x16:
-					key->ascii = 'ú';
-					break;
-				case 0x17:
-					key->ascii= 'í';
-					break;
-				case 0x18:
-					key->ascii= 'ó';
-					break;
-				}
+			case 0x12:
+				key->ascii = 0xa0;
+				break;
+			case 0x1e:
+				key->ascii = 0x82;
+				break;
+			case 0x16:
+				key->ascii = 0xa1;
+				break;
+			case 0x17:
+				key->ascii = 0xa2;
+				break;
+			case 0x18:
+				key->ascii = 0xa3;
+				break;
+			}
+			key->kind = ALPHANUM_KEY;
 			keyboard.dead_key = FALSE;
 
 		} else {
 
+			int state = LOWER;
+
 			if (printable(c)) {
 				key->kind = ALPHANUM_KEY;
 
-				if (keyboard.caps_state != keyboard.shift_state) {
-					keyboard.state = UPPER;
-				} else {
-					keyboard.state = LOWER;
+				if (keyboard.caps_state == TRUE && keyboard.shift_state == FALSE
+						&& is_letter(c)) {
+					state = UPPER;
+				} else if (keyboard.caps_state == FALSE
+						&& keyboard.shift_state == TRUE) {
+					state = UPPER;
 				}
 
 			}
 
-			key->ascii = scancode_table[keyboard.language][keyboard.state][c];
+			key->ascii = scancode_table[keyboard.language][state][c];
 		}
 	}
 	return key;
@@ -119,8 +124,15 @@ int printable(unsigned char c) {
 	return FALSE;
 }
 
-int is_vowel(unsigned char c){
+int is_letter(unsigned char c) {
+	if ((c > 15 && c < 26) || (c > 29 && c < 39) || (c > 42 && c < 50))
+		return TRUE;
+	return FALSE;
+}
+
+int is_vowel(unsigned char c) {
 	if (c == 0x12 || c == 0x1e || c == 0x16 || c == 0x17 || c == 0x18)
 		return TRUE;
 	return FALSE;
 }
+

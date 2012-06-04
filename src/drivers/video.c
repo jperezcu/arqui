@@ -1,67 +1,81 @@
 #include "../../include/defs.h"
-#include "../../include/kc.h"
+#include "../../include/video.h"
 
-extern screen_type screen;
-
-void refresh_screen();
-void move_screen();
+extern int current_vt;
+extern struct vt_type vt[];
 
 void print(char c) {
-	if (screen.line_pos == LINE_BUFFER_SIZE - 1) {
-		screen.line_pos = 0;
+
+	screen_type * screen = vt[current_vt].screen;
+	input_type * input = vt[current_vt].input;
+
+	if (input->cursor == INPUT_BUFFER_SIZE - 1) {
+		input->cursor = 0;
 	}
-	if (screen.video_pos == WIDTH * HEIGHT * 2) {
+	if (screen->cursor == SCREEN_SIZE) {
 		move_screen();
 	}
-	screen.line_buffer[screen.line_pos++] = c;
-	screen.line_buffer[screen.line_pos++] = WHITE_TXT;
 
-	screen.video[screen.video_pos++] = c;
-	screen.video[screen.video_pos++] = WHITE_TXT;
-
+	input->buffer[input->cursor++] = c;
+	input->buffer[input->cursor++] = WHITE_TXT;
+	screen->content[screen->cursor++] = c;
+	screen->content[screen->cursor++] = WHITE_TXT;
 }
 
 void del() {
 //	TODO escribo primer caracter, borro y no reemplaza el primer lugar por caracter vacio.
 
-	if (screen.video_pos != 0 && screen.line_pos != 0) {
-		screen.line_pos -= 2;
+	screen_type * screen = vt[current_vt].screen;
+	input_type * input = vt[current_vt].input;
 
-//		esta bien para vaciar caracter??
-		screen.video[screen.video_pos - 2] = ' ';
-		screen.video[screen.video_pos - 1] = WHITE_TXT;
+	if (screen->cursor != 0 && input->cursor != 0) {
+		input->cursor -= 2;
 
-		screen.video_pos -= 2;
+		screen->content[screen->cursor - 2] = ' ';
+		screen->content[screen->cursor - 1] = WHITE_TXT;
+
+		screen->cursor -= 2;
 	}
 
 }
 void skip_line() {
-	screen.line_pos = 0;
-	if ((screen.video_pos >= WIDTH * (HEIGHT - 1) * 2)
-			&& (screen.video_pos < (WIDTH * HEIGHT * 2))) {
+
+	screen_type * screen = vt[current_vt].screen;
+	input_type * input = vt[current_vt].input;
+
+	input->cursor = 0;
+	if ((screen->cursor >= LAST_LINE_BEGIN)
+			&& (screen->cursor <= LAST_LINE_END)) {
 		move_screen();
 	} else {
-		screen.video_pos += WIDTH * 2 - (screen.video_pos % (WIDTH * 2));
+		screen->cursor += WIDTH * 2 - (screen->cursor % (WIDTH * 2));
 	}
 }
 
 void refresh_screen() {
+
+	screen_type * screen = vt[current_vt].screen;
+
 	char *monitor = (char *) 0xb8000;
 	int i;
-	for (i = 0; i < (screen.video_pos * 2); i++) {
-		monitor[i] = screen.video[i];
+	for (i = 0; i < (screen->cursor * 2); i++) {
+		monitor[i] = screen->content[i];
 	}
 }
 
 void move_screen() {
+
+	screen_type * screen = vt[current_vt].screen;
+	input_type * input = vt[current_vt].input;
+
 	int i, j;
-	for (i = 0, j = (WIDTH * 2); j < (2 * WIDTH * HEIGHT); i++, j++) {
-		screen.video[i] = screen.video[j];
+	for (i = 0, j = (WIDTH * 2); j < SCREEN_SIZE; i++, j++) {
+		screen->content[i] = screen->content[j];
 	}
-	while (i < (2 * WIDTH * HEIGHT)) {
-		screen.video[i++] = ' ';
-		screen.video[i++] = WHITE_TXT;
+	while (i < SCREEN_SIZE) {
+		screen->content[i++] = ' ';
+		screen->content[i++] = WHITE_TXT;
 	}
 
-	screen.video_pos = WIDTH * (HEIGHT - 1) * 2;
+	screen->cursor = LAST_LINE_BEGIN;
 }

@@ -6,8 +6,9 @@
 *
 ***********************************/
 
-void print();
+void print(char c);
 void del();
 void refresh_screen();
+void move_screen();
 
 #endif
