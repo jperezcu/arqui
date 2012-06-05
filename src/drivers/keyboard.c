@@ -91,19 +91,19 @@ struct key_type * parse_scancode(unsigned char c) {
 // TODO hacer para mayusculas tambien
 			switch (c) {
 			case 0x12:
-				key->ascii = 0xa0;
-				break;
-			case 0x1e:
 				key->ascii = 0x82;
 				break;
+			case 0x1e:
+				key->ascii = 0xa0;
+				break;
 			case 0x16:
-				key->ascii = 0xa1;
+				key->ascii = 0xa3;
 				break;
 			case 0x17:
-				key->ascii = 0xa2;
+				key->ascii = 0xa1;
 				break;
 			case 0x18:
-				key->ascii = 0xa3;
+				key->ascii = 0xa2;
 				break;
 			}
 			key->kind = ALPHANUM_KEY;

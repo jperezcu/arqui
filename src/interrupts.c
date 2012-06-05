@@ -20,19 +20,26 @@ void int_08() {
 void int_09(unsigned char scancode) {
 
 	struct key_type * key = (struct key_type *) parse_scancode(scancode);
-	if (key->kind == ALPHANUM_KEY) {
+	if (key->ascii != 0) {
 		print(key->ascii);
-	} else if (key->kind == FUNCTION_KEY) {
-		switch (key->ascii) {
-		case '\b':
-			del();
-			break;
-		case '\n':
-			skip_line();
-			break;
-		default:
-			break;
-		}
 	}
 	refresh_screen();
+}
+
+/**********************************************
+ int_80()
+ Atenci—n de interrupci—n de software
+ *************************************************/
+
+void int_80(int service_number, int device, char * buffer, int amount) {
+	switch (service_number) {
+	case READ:
+		read(device, buffer, amount);
+		break;
+	case WRITE:
+		write(device, buffer, amount);
+		break;
+	default:
+		break;
+	}
 }

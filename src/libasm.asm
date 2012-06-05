@@ -1,11 +1,14 @@
 GLOBAL  _read_msw,_lidt
 GLOBAL  _int_08_hand
 GLOBAL  _int_09_hand
+GLOBAL  _int_80_hand
+GLOBAL  _system_call
 GLOBAL  _mascaraPIC1,_mascaraPIC2,_Cli,_Sti
 GLOBAL  _debug
 
 EXTERN  int_08
 EXTERN  int_09
+EXTERN  int_80
 
 
 SECTION .text
@@ -70,6 +73,63 @@ _int_09_hand:				; Handler de INT 9 (Keyboard)
 	pop	eax
 
 	jmp	EOI					; Envio de EOI generico al PIC
+
+_int_80_hand:				; Handler de INT 80
+
+	push ebp
+	mov ebp, esp				;StackFrame
+
+	sti
+
+	push edi
+	push esi
+	push edx
+	push ecx
+	push ebx
+	push eax
+
+	call int_80
+
+	pop eax
+	pop ebx
+	pop ecx
+	pop edx
+	pop esi
+	pop edi
+
+	mov esp, ebp
+	pop ebp
+	ret
+
+_system_call:
+
+	push ebp
+	mov ebp, esp
+
+	push ebx
+	push ecx
+	push edx
+	push esi
+	push edi
+
+	mov eax, [ebp + 8] ; Syscall number
+	mov ebx, [ebp + 12]; Arg1
+	mov ecx, [ebp + 16]; Arg2
+	mov edx, [ebp + 20]; Arg3
+	mov esi, [ebp + 24]; Arg4
+	mov edi, [ebp + 28]; Arg5
+
+	int 80h
+
+	pop edi
+	pop esi
+	pop edx
+	pop ecx
+	pop ebx
+
+	mov esp, ebp
+	pop ebp
+	ret
 
 EOI:
 

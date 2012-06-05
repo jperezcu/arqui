@@ -7,29 +7,43 @@ extern struct vt_type vt[];
 void print(char c) {
 
 	screen_type * screen = vt[current_vt].screen;
-	input_type * input = vt[current_vt].input;
 
-	if (input->cursor == INPUT_BUFFER_SIZE - 1) {
-		input->cursor = 0;
-	}
-	if (screen->cursor == SCREEN_SIZE) {
-		move_screen();
-	}
+	switch (c) {
+	case '\b':
+		del();
+		break;
+	case '\n':
+		skip_line();
+		break;
+	default:
+//	input_type * input = vt[current_vt].input;
 
-	input->buffer[input->cursor++] = c;
-	input->buffer[input->cursor++] = WHITE_TXT;
-	screen->content[screen->cursor++] = c;
-	screen->content[screen->cursor++] = WHITE_TXT;
+//	if (input->cursor == INPUT_BUFFER_SIZE - 1) {
+//		input->cursor = 0;
+//	}
+		if (screen->cursor == SCREEN_SIZE) {
+			move_screen();
+		}
+
+//	input->buffer[input->cursor++] = c;
+//	input->buffer[input->cursor++] = WHITE_TXT;
+
+		screen->content[screen->cursor++] = c;
+		screen->content[screen->cursor++] = WHITE_TXT;
+		break;
+	}
 }
 
 void del() {
 //	TODO escribo primer caracter, borro y no reemplaza el primer lugar por caracter vacio.
 
 	screen_type * screen = vt[current_vt].screen;
-	input_type * input = vt[current_vt].input;
+//	input_type * input = vt[current_vt].input;
 
-	if (screen->cursor != 0 && input->cursor != 0) {
-		input->cursor -= 2;
+	if (screen->cursor != 0){
+//		if(input->cursor != 0) {
+//	}
+//		input->cursor -= 2;
 
 		screen->content[screen->cursor - 2] = ' ';
 		screen->content[screen->cursor - 1] = WHITE_TXT;
@@ -41,9 +55,9 @@ void del() {
 void skip_line() {
 
 	screen_type * screen = vt[current_vt].screen;
-	input_type * input = vt[current_vt].input;
+//	input_type * input = vt[current_vt].input;
 
-	input->cursor = 0;
+//	input->cursor = 0;
 	if ((screen->cursor >= LAST_LINE_BEGIN)
 			&& (screen->cursor <= LAST_LINE_END)) {
 		move_screen();
@@ -58,11 +72,11 @@ void refresh_screen() {
 
 	char *monitor = (char *) 0xb8000;
 
-	monitor[SCREEN_SIZE-2] = current_vt+'0';
-	monitor[SCREEN_SIZE-1] = WHITE_TXT;
+	monitor[SCREEN_SIZE - 2] = current_vt + '0';
+	monitor[SCREEN_SIZE - 1] = WHITE_TXT;
 
 	int i;
-	for (i = 0; i < (screen->cursor * 2); i++) {
+	for (i = 0; i < SCREEN_SIZE - 2; i++) {
 		monitor[i] = screen->content[i];
 	}
 }
@@ -70,7 +84,6 @@ void refresh_screen() {
 void move_screen() {
 
 	screen_type * screen = vt[current_vt].screen;
-	input_type * input = vt[current_vt].input;
 
 	int i, j;
 	for (i = 0, j = (WIDTH * 2); j < SCREEN_SIZE; i++, j++) {

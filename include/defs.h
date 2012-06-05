@@ -131,7 +131,7 @@ typedef struct key_type {
 /* Pantalla */
 typedef struct screen_type {
 	int cursor;
-	char * content;
+	char content[SCREEN_SIZE];
 } screen_type;
 
 /* Tama–o de shell->buffer */
@@ -140,7 +140,7 @@ typedef struct screen_type {
 /* input del usuario en terminal virtual */
 typedef struct input_type {
 	int cursor;
-	char * buffer;
+	char buffer[INPUT_BUFFER_SIZE];
 } input_type;
 
 /* terminal virtual */
@@ -151,6 +151,14 @@ typedef struct vt_type {
 
 /* Cantidad de terminales virtuales */
 #define VT_AMOUNT	4
+
+/* Service_number para la int 80 */
+#define READ	3
+#define WRITE	4
+
+/* Device para la int 80 */
+#define STDIN	0
+#define STDOUT	1
 
 #endif
 

@@ -1,7 +1,7 @@
 #include "../include/kasm.h"
 #include "../include/defs.h"
 
-DESCR_INT idt[0xA]; /* IDT de 10 entradas */
+DESCR_INT idt[0x100]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
 
 /* Definir‡ las entradas del IDT */
@@ -37,10 +37,13 @@ kmain() {
 	_Cli();
 
 	/* Habilita interrupciones en el PIC */
-	_mascaraPIC1(0xFC);
+	_mascaraPIC1(0xF8);
 	_mascaraPIC2(0xFF);
 
 	_Sti();
+
+	_debug();
+	putc('a');
 
 	while (1) {
 	}
@@ -56,6 +59,8 @@ void setup_IDT_content() {
 	setup_IDT_entry(&idt[0x08], 0x08, (dword) &_int_08_hand, ACS_INT, 0);
 	//	IRQ1: keyboard
 	setup_IDT_entry(&idt[0x09], 0x08, (dword) &_int_09_hand, ACS_INT, 0);
+	//	IRQ2: int80
+	setup_IDT_entry(&idt[0x80], 0x08, (dword) &_int_80_hand, ACS_INT, 0);
 }
 
 /**********************************************
@@ -95,13 +100,13 @@ int current_vt = 0;
 void setup_vts() {
 	int i, j;
 	for (i = 0; i < VT_AMOUNT; i++) {
-		for (j = 0; j < SCREEN_SIZE; j += 2) {
-			vt[i].screen->content[j] = 0;
-			vt[i].screen->content[j + 1] = WHITE_TXT;
+		for (j = 0; j < SCREEN_SIZE; j++) {
+			vt[i].screen->content[j++] = 0;
+			vt[i].screen->content[j] = WHITE_TXT;
 		}
 		for (j = 0; j < INPUT_BUFFER_SIZE; j++) {
-			vt[i].input->buffer[j++] = 0;
 			vt[i].input->buffer[j] = WHITE_TXT;
+			vt[i].input->buffer[j++] = 0;
 		}
 	}
 
@@ -110,6 +115,6 @@ void setup_vts() {
 void deb(unsigned char c) {
 
 	char *monitor = (char *) 0xb8000;
-	monitor[1] = WHITE_TXT;
-	monitor[0] = c;
+	monitor[SCREEN_SIZE - WIDTH*2] = WHITE_TXT;
+	monitor[SCREEN_SIZE - WIDTH*2 + 1] = c + '0';
 }
