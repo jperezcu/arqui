@@ -4,18 +4,11 @@
 DESCR_INT idt[0xA]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
 
-struct keyboard_type keyboard;
-int current_vt;
-vt_type vt[4];
-
 /* Definir‡ las entradas del IDT */
 void setup_IDT_content();
 
 /* Definir‡ el IDTR */
 void setup_IDTR();
-
-/* Definir‡ el teclado */
-void setup_keyboard();
 
 /* Definir‡ las terminales virtuales */
 void setup_vts();
@@ -32,10 +25,7 @@ kmain() {
 	/* Borra la pantalla. */
 	k_clear_screen();
 
-	/* Crea el teclado default */
-	setup_keyboard();
-
-	/* Crea la pantalla*/
+	/* Crea la pantalla */
 	setup_vts();
 
 	/* Carga de entradas en IDT */
@@ -82,44 +72,39 @@ void setup_IDTR() {
 }
 
 /**********************************************
- setup_keyboard()
  Inicializa el teclado.
  *************************************************/
 
-void setup_keyboard() {
-	keyboard.language = ENGLISH;
-	keyboard.caps_state = FALSE;
-	keyboard.shift_state = FALSE;
-	keyboard.dead_key = FALSE;
-}
+struct keyboard_type keyboard = { ENGLISH, FALSE, FALSE, FALSE, FALSE, FALSE,
+		FALSE };
 
 /**********************************************
  setup_vts()
  Inicializa las terminales virtuales.
  *************************************************/
 
+struct screen_type screen[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
+
+struct input_type input[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
+
+struct vt_type vt[VT_AMOUNT] = { { &screen[0], &input[0] }, { &screen[1],
+		&input[1] }, { &screen[2], &input[2] }, { &screen[3], &input[3] } };
+
+int current_vt = 0;
+
 void setup_vts() {
-	current_vt = 0;
 	int i, j;
-
-	for (j = 0; j < VT_AMOUNT; j++) {
-		screen_type screen;
-		for (i = 0; i < SCREEN_SIZE; i++) {
-			screen.content[i++] = 0;
-			screen.content[i] = WHITE_TXT;
+	for (i = 0; i < VT_AMOUNT; i++) {
+		for (j = 0; j < SCREEN_SIZE; j += 2) {
+			vt[i].screen->content[j] = 0;
+			vt[i].screen->content[j + 1] = WHITE_TXT;
 		}
-		screen.cursor = 0;
-
-		input_type input;
-		for (i = 0; i < INPUT_BUFFER_SIZE; i++) {
-			input.buffer[i++] = 0;
-			input.buffer[i] = WHITE_TXT;
+		for (j = 0; j < INPUT_BUFFER_SIZE; j++) {
+			vt[i].input->buffer[j++] = 0;
+			vt[i].input->buffer[j] = WHITE_TXT;
 		}
-		input.cursor = 0;
-
-		vt_type term = { &screen, &input };
-		vt[j] = term;
 	}
+
 }
 
 void deb(unsigned char c) {

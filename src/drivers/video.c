@@ -57,6 +57,10 @@ void refresh_screen() {
 	screen_type * screen = vt[current_vt].screen;
 
 	char *monitor = (char *) 0xb8000;
+
+	monitor[SCREEN_SIZE-2] = current_vt+'0';
+	monitor[SCREEN_SIZE-1] = WHITE_TXT;
+
 	int i;
 	for (i = 0; i < (screen->cursor * 2); i++) {
 		monitor[i] = screen->content[i];

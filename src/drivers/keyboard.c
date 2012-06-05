@@ -3,6 +3,8 @@
 
 struct key_type * key;
 extern keyboard_type keyboard;
+extern int current_vt;
+extern vt_type vt[];
 
 unsigned char scancode_table[LANGUAGES][STATES][KEYS] = { { { 0, 0x1b, '1', '2',
 		'3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', '\t', 'q', 'w',
@@ -46,6 +48,10 @@ struct key_type * parse_scancode(unsigned char c) {
 	case RIGHT_SHIFT_PRESSED:
 		if (keyboard.alt_state == TRUE) {
 			keyboard.language = !keyboard.language;
+		} else if (keyboard.arrow_right == TRUE) {
+			show_next_vt();
+		} else if (keyboard.arrow_left == TRUE) {
+			show_previous_vt();
 		}
 	case LEFT_SHIFT_RELEASED:
 	case RIGHT_SHIFT_RELEASED:
@@ -67,12 +73,22 @@ struct key_type * parse_scancode(unsigned char c) {
 			keyboard.dead_key = TRUE;
 		}
 		break;
+	case ARROW_RIGHT:
+		if (keyboard.shift_state == TRUE) {
+			show_next_vt();
+		}
+		break;
+	case ARROW_LEFT:
+		if (keyboard.shift_state == TRUE) {
+			show_previous_vt();
+		}
+		break;
 	default:
 //		si es un key release, ignorar.
 		if (c & 0x80) {
 			key->ascii = 0;
 		} else if (keyboard.dead_key == TRUE && is_vowel(c)) {
-
+// TODO hacer para mayusculas tambien
 			switch (c) {
 			case 0x12:
 				key->ascii = 0xa0;
@@ -108,6 +124,8 @@ struct key_type * parse_scancode(unsigned char c) {
 					state = UPPER;
 				}
 
+			} else {
+				key->kind = FUNCTION_KEY;
 			}
 
 			key->ascii = scancode_table[keyboard.language][state][c];
@@ -136,3 +154,18 @@ int is_vowel(unsigned char c) {
 	return FALSE;
 }
 
+void show_next_vt() {
+	if (current_vt == (VT_AMOUNT - 1)) {
+		current_vt = 0;
+	} else {
+		current_vt++;
+	}
+}
+
+void show_previous_vt() {
+	if (current_vt == 0) {
+		current_vt = VT_AMOUNT - 1;
+	} else {
+		current_vt--;
+	}
+}

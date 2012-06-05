@@ -19,21 +19,20 @@ void int_08() {
 
 void int_09(unsigned char scancode) {
 
-
-
 	struct key_type * key = (struct key_type *) parse_scancode(scancode);
 	if (key->kind == ALPHANUM_KEY) {
 		print(key->ascii);
-	}
-	switch (key->ascii) {
-	case '\b':
-		del();
-		break;
-	case '\n':
-		skip_line();
-		break;
-	default:
-		break;
+	} else if (key->kind == FUNCTION_KEY) {
+		switch (key->ascii) {
+		case '\b':
+			del();
+			break;
+		case '\n':
+			skip_line();
+			break;
+		default:
+			break;
+		}
 	}
 	refresh_screen();
 }

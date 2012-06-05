@@ -56,6 +56,8 @@ typedef struct keyboard_type {
 	int shift_state;
 	int alt_state;
 	int dead_key;
+	int arrow_left;
+	int arrow_right;
 	char buffer[KEYBOARD_BUFFER_SIZE];
 } keyboard_type;
 
@@ -128,8 +130,8 @@ typedef struct key_type {
 
 /* Pantalla */
 typedef struct screen_type {
-	char content[SCREEN_SIZE];
 	int cursor;
+	char * content;
 } screen_type;
 
 /* Tama–o de shell->buffer */
@@ -137,8 +139,8 @@ typedef struct screen_type {
 
 /* input del usuario en terminal virtual */
 typedef struct input_type {
-	char buffer[INPUT_BUFFER_SIZE];
 	int cursor;
+	char * buffer;
 } input_type;
 
 /* terminal virtual */
