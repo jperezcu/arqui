@@ -47,7 +47,7 @@ typedef struct {
 } IDTR;
 
 /* Tama–o de keyboard->buffer */
-#define KEYBOARD_BUFFER_SIZE	10
+#define KEYBOARD_BUFFER_SIZE	16
 
 /* Teclado */
 typedef struct keyboard_type {
@@ -58,6 +58,8 @@ typedef struct keyboard_type {
 	int dead_key;
 	int arrow_left;
 	int arrow_right;
+	int read_cursor;
+	int write_cursor;
 	char buffer[KEYBOARD_BUFFER_SIZE];
 } keyboard_type;
 

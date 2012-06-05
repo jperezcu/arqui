@@ -169,3 +169,11 @@ void show_previous_vt() {
 		current_vt--;
 	}
 }
+
+unsigned char get_char_from_keyboard(){
+	return keyboard.buffer[keyboard.read_cursor++];
+}
+
+int keyboard_buffer_can_read(){
+	return keyboard.buffer[keyboard.read_cursor] != 0;
+}

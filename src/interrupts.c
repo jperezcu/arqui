@@ -21,9 +21,10 @@ void int_09(unsigned char scancode) {
 
 	struct key_type * key = (struct key_type *) parse_scancode(scancode);
 	if (key->ascii != 0) {
-		print(key->ascii);
+//		print(key->ascii);
+//		add_to_keyboard_buffer()
 	}
-	refresh_screen();
+//	refresh_screen();
 }
 
 /**********************************************

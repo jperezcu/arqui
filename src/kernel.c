@@ -13,6 +13,8 @@ void setup_IDTR();
 /* Definirá las terminales virtuales */
 void setup_vts();
 
+void setup_keyboard_buffer();
+
 /**********************************************
  kmain()
  Punto de entrada de c√≥o C.
@@ -24,6 +26,8 @@ kmain() {
 
 	/* Borra la pantalla. */
 	k_clear_screen();
+
+	setup_keyboard_buffer();
 
 	/* Crea la pantalla */
 	setup_vts();
@@ -42,10 +46,17 @@ kmain() {
 
 	_Sti();
 
-	_debug();
-	putc('a');
+//	for (i = 0; i < SCREEN_SIZE - 2; i++) {
+//		putc('a');
+//	}
+
+	for (i = 0; i < KEYBOARD_BUFFER_SIZE; i++) {
+		putc(getc());
+	}
+	refresh_screen();
 
 	while (1) {
+
 	}
 }
 
@@ -81,7 +92,14 @@ void setup_IDTR() {
  *************************************************/
 
 struct keyboard_type keyboard = { ENGLISH, FALSE, FALSE, FALSE, FALSE, FALSE,
-		FALSE };
+		FALSE, 0, 0 };
+
+void setup_keyboard_buffer() {
+	int j;
+	for (j = 0; j < KEYBOARD_BUFFER_SIZE; j++) {
+		keyboard.buffer[j] = 'a';
+	}
+}
 
 /**********************************************
  setup_vts()
@@ -115,6 +133,6 @@ void setup_vts() {
 void deb(unsigned char c) {
 
 	char *monitor = (char *) 0xb8000;
-	monitor[SCREEN_SIZE - WIDTH*2] = WHITE_TXT;
-	monitor[SCREEN_SIZE - WIDTH*2 + 1] = c + '0';
+	monitor[SCREEN_SIZE - WIDTH * 2] = WHITE_TXT;
+	monitor[SCREEN_SIZE - WIDTH * 2 + 1] = c + '0';
 }

@@ -47,12 +47,11 @@ void putc(unsigned char c) {
 
 unsigned char getc() {
 	char c;
-//	_system_call(READ, STDIN, &c_copy, 1);
+	_system_call(READ, STDIN, &c, 1);
 	return c;
 }
 
 void write(int device, char * buffer, int amount) {
-
 	if (device == STDOUT) {
 		int i;
 		for (i = 0; i < amount; i++) {
@@ -61,8 +60,11 @@ void write(int device, char * buffer, int amount) {
 	}
 }
 
-void read(int device, char * buffer, int amount) {
+void read(int device, char * buffer, int amount) { // siempre vamos a leer con amount=1...
 	if (device == STDIN) {
-
+		int i;
+		for (i = 0; i < amount && keyboard_buffer_can_read(); i++) {
+			buffer[i] = get_char_from_keyboard();
+		}
 	}
 }
