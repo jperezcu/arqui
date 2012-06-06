@@ -48,10 +48,6 @@ struct key_type * parse_scancode(unsigned char c) {
 	case RIGHT_SHIFT_PRESSED:
 		if (keyboard.alt_state == TRUE) {
 			keyboard.language = !keyboard.language;
-		} else if (keyboard.arrow_right == TRUE) {
-			show_next_vt();
-		} else if (keyboard.arrow_left == TRUE) {
-			show_previous_vt();
 		}
 	case LEFT_SHIFT_RELEASED:
 	case RIGHT_SHIFT_RELEASED:
@@ -73,20 +69,12 @@ struct key_type * parse_scancode(unsigned char c) {
 			keyboard.dead_key = TRUE;
 		}
 		break;
-	case ARROW_RIGHT:
-		if (keyboard.shift_state == TRUE) {
-			show_next_vt();
-		}
-		break;
-	case ARROW_LEFT:
-		if (keyboard.shift_state == TRUE) {
-			show_previous_vt();
-		}
-		break;
 	default:
 //		si es un key release, ignorar.
 		if (c & 0x80) {
-			key->ascii = 0;
+			key->kind == HIDDEN_KEY;
+		} else if (keyboard.alt_state == TRUE && is_terminal_number(c)) {
+			change_terminal(c - 0x3b);
 		} else if (keyboard.dead_key == TRUE && is_vowel(c)) {
 // TODO hacer para mayusculas tambien
 			switch (c) {
@@ -154,26 +142,30 @@ int is_vowel(unsigned char c) {
 	return FALSE;
 }
 
-void show_next_vt() {
-	if (current_vt == (VT_AMOUNT - 1)) {
-		current_vt = 0;
+int is_terminal_number(unsigned char c) {
+	return (c > 0x02 && c < 0x06) ? 1 : 0;
+}
+
+unsigned char get_char_from_keyboard_buffer() {
+	char ans = keyboard.buffer[keyboard.read_cursor];
+	keyboard.buffer[keyboard.read_cursor] = 0;
+	if (keyboard.read_cursor == KEYBOARD_BUFFER_SIZE - 1) {
+		keyboard.read_cursor = 0;
 	} else {
-		current_vt++;
+		keyboard.read_cursor++;
 	}
+	return ans;
 }
 
-void show_previous_vt() {
-	if (current_vt == 0) {
-		current_vt = VT_AMOUNT - 1;
+int keyboard_buffer_can_read() {
+	return (keyboard.buffer[keyboard.read_cursor] != 0) ? 1 : 0;
+}
+
+void add_to_keyboard_buffer(unsigned char c) {
+	keyboard.buffer[keyboard.write_cursor] = c;
+	if (keyboard.write_cursor == KEYBOARD_BUFFER_SIZE - 1) {
+		keyboard.write_cursor = 0;
 	} else {
-		current_vt--;
+		keyboard.write_cursor++;
 	}
-}
-
-unsigned char get_char_from_keyboard(){
-	return keyboard.buffer[keyboard.read_cursor++];
-}
-
-int keyboard_buffer_can_read(){
-	return keyboard.buffer[keyboard.read_cursor] != 0;
 }

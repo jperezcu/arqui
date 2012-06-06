@@ -50,14 +50,12 @@ kmain() {
 //		putc('a');
 //	}
 
-	for (i = 0; i < KEYBOARD_BUFFER_SIZE; i++) {
-		putc(getc());
-	}
-	refresh_screen();
+//	start_shell();
+	putd(1000);
 
-	while (1) {
+//	while (1) {
 
-	}
+//	}
 }
 
 /**********************************************
@@ -97,7 +95,7 @@ struct keyboard_type keyboard = { ENGLISH, FALSE, FALSE, FALSE, FALSE, FALSE,
 void setup_keyboard_buffer() {
 	int j;
 	for (j = 0; j < KEYBOARD_BUFFER_SIZE; j++) {
-		keyboard.buffer[j] = 'a';
+		keyboard.buffer[j] = 0;
 	}
 }
 
@@ -108,10 +106,10 @@ void setup_keyboard_buffer() {
 
 struct screen_type screen[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
 
-struct input_type input[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
+struct shell_type shell[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
 
-struct vt_type vt[VT_AMOUNT] = { { &screen[0], &input[0] }, { &screen[1],
-		&input[1] }, { &screen[2], &input[2] }, { &screen[3], &input[3] } };
+struct vt_type vt[VT_AMOUNT] = { { &screen[0], &shell[0] }, { &screen[1],
+		&shell[1] }, { &screen[2], &shell[2] }, { &screen[3], &shell[3] } };
 
 int current_vt = 0;
 
@@ -122,12 +120,19 @@ void setup_vts() {
 			vt[i].screen->content[j++] = 0;
 			vt[i].screen->content[j] = WHITE_TXT;
 		}
-		for (j = 0; j < INPUT_BUFFER_SIZE; j++) {
-			vt[i].input->buffer[j] = WHITE_TXT;
-			vt[i].input->buffer[j++] = 0;
+		for (j = 0; j < SHELL_BUFFER_SIZE; j++) {
+			vt[i].shell->buffer[j] = WHITE_TXT;
+			vt[i].shell->buffer[j++] = 0;
 		}
 	}
 
+}
+
+void change_terminal(int number) {
+	if (current_vt != number) {
+		current_vt = number;
+		refresh_screen();
+	}
 }
 
 void deb(unsigned char c) {

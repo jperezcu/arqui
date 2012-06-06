@@ -20,11 +20,9 @@ void int_08() {
 void int_09(unsigned char scancode) {
 
 	struct key_type * key = (struct key_type *) parse_scancode(scancode);
-	if (key->ascii != 0) {
-//		print(key->ascii);
-//		add_to_keyboard_buffer()
+	if (key->kind != HIDDEN_KEY) {
+		add_to_keyboard_buffer(key->ascii);
 	}
-//	refresh_screen();
 }
 
 /**********************************************

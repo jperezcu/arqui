@@ -123,6 +123,11 @@ typedef struct key_type {
 #define SPACE			0x39
 #define TABULAR		0x0f
 
+#define ONE 0x02
+#define TWO 0x03
+#define THREE 0x04
+#define FOUR 0x05
+
 /* Medidas de pantalla */
 #define WIDTH 80
 #define HEIGHT 25
@@ -137,18 +142,18 @@ typedef struct screen_type {
 } screen_type;
 
 /* Tama–o de shell->buffer */
-#define INPUT_BUFFER_SIZE	1024
+#define SHELL_BUFFER_SIZE	1024
 
 /* input del usuario en terminal virtual */
-typedef struct input_type {
+typedef struct shell_type {
 	int cursor;
-	char buffer[INPUT_BUFFER_SIZE];
-} input_type;
+	char buffer[SHELL_BUFFER_SIZE];
+} shell_type;
 
 /* terminal virtual */
 typedef struct vt_type {
 	screen_type * screen;
-	input_type * input;
+	shell_type * shell;
 } vt_type;
 
 /* Cantidad de terminales virtuales */
@@ -161,6 +166,8 @@ typedef struct vt_type {
 /* Device para la int 80 */
 #define STDIN	0
 #define STDOUT	1
+
+#define LIBC_BUFFER_SIZE	128
 
 #endif
 

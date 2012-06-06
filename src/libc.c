@@ -1,4 +1,5 @@
 #include "../include/kc.h"
+#include <stdarg.h>
 
 extern vt_type * vt;
 extern int current_vt;
@@ -45,8 +46,21 @@ void putc(unsigned char c) {
 	_system_call(WRITE, STDOUT, &c_copy, 1);
 }
 
+void putd(int d) {
+	int i;
+	char aux[32];
+
+	for (i = 31; (d / 10) != 0 && i >= 0; i++) {
+		aux[i] = d % 10;
+		d = d / 10;
+	}
+	for (; i < 32; i++) {
+		putc(aux[i]);
+	}
+}
+
 unsigned char getc() {
-	char c;
+	char c = -1;
 	_system_call(READ, STDIN, &c, 1);
 	return c;
 }
@@ -64,7 +78,56 @@ void read(int device, char * buffer, int amount) { // siempre vamos a leer con a
 	if (device == STDIN) {
 		int i;
 		for (i = 0; i < amount && keyboard_buffer_can_read(); i++) {
-			buffer[i] = get_char_from_keyboard();
+			buffer[i] = get_char_from_keyboard_buffer();
 		}
 	}
 }
+
+//void printf(char * string, ...) {
+//	int i = 0;
+//	int int_value;
+//	char char_value;
+//	char * string_value;
+//
+//	va_list args; // apunta a la lista de argumentos
+//
+//	va_start(args, string); // inicializa args para que apunte al primer argumento variable
+//
+//	while (string[i] != '\0') {
+//		if (string[i] != '%' && string[i] != '\\') {
+//			putc(string[i]); //letra comun
+//		} else {
+//			switch (string[i]) {
+//			case '%':
+//				char next_char = string[i + 1];
+//				switch (next_char) {
+//				case d: //llega %d
+//					int_value = va_arg(args,int);
+//					putd(int_value);
+//					break;
+//				case c: //llega %c
+//					char_value = va_arg(args,char);
+//					putc(char_value);
+//					break;
+//				case s: //llega %d
+//
+//				default:
+//					putc(string[i]); //llega % seguido de otra cosa
+//					break;
+//				}
+//				break;
+//			case '\\':
+//				char next_char = string[i + 1];
+//				if (next_char == 'n') {
+//					putc('\n'); //llega /n
+//				} else {
+//					putc(string[i]); //llega / seguido de otra cosa
+//				}
+//				break;
+//			}
+//
+//		}
+//
+//	}
+//
+//}
