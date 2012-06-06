@@ -49,13 +49,13 @@ kmain() {
 //	for (i = 0; i < SCREEN_SIZE - 2; i++) {
 //		putc('a');
 //	}
+	start_shell();
+	//printf("Esto es un nu%mero: %d \nEsto es un c\aracter: %c \nEsto es un string: %s \n",34, "T","hello world");
+	//refresh_screen();
 
-//	start_shell();
-	putd(1000);
+	while (1) {
 
-//	while (1) {
-
-//	}
+	}
 }
 
 /**********************************************

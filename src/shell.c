@@ -44,16 +44,10 @@ void parse_command() {
 	if (shell->cursor != 0) {
 		switch (shell->buffer[0]) {
 		case 'h':
-			putc('h');
-			putc('e');
-			putc('l');
-			putc('p');
+			printf("Help\n");
 			break;
 		default:
-			putc('e');
-			putc('r');
-			putc('r');
+			printf("Error\n");
 		}
-		putc('\n');
 	}
 }
