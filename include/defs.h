@@ -167,7 +167,5 @@ typedef struct vt_type {
 #define STDIN	0
 #define STDOUT	1
 
-#define LIBC_BUFFER_SIZE	128
-
 #endif
 

@@ -47,19 +47,22 @@ void putc(unsigned char c) {
 }
 
 void putd(long int d) {
-	int i=31;
+	int i = 31;
 	char aux[32];
-	while(i>=0 && d >0 ){
-		aux[i]=(d%10)+'0';
-		d/=10;
-		i--;		
+	if(d==0){
+		d+='0';
+		aux[i]=d;
+	} else {
+		while (i >= 0 && d > 0) {
+			aux[i--] = (d % 10) + '0';
+			d /= 10;
 		}
 		i++;
-	for(;i<32;i++){
+	}
+	for (; i < 32; i++) {
 		putc(aux[i]);
 	}
 
-	
 }
 
 unsigned char getc() {
@@ -103,43 +106,71 @@ void printf(char * string, ...) {
 			putc(string[i]); //letra comun
 		} else {
 			switch (string[i]) {
-			case '%':
-			{
+			case '%': {
 				next_char = string[i + 1];
 				switch (next_char) {
-					case 'd': //llega %d
-						int_value = va_arg(args,int);
-						putd(int_value);
-						i++;
-						break;
-					case 'c':
-					case 's': //llega %d
-						string_value = va_arg(args,char*);
-						for(j=0; string_value[j] != '\0';j++){
-							putc(string_value[j]);
-						}
-						i++;
-						break;
-					default:
-						putc(string[i]); //llega % seguido de otra cosa
-						break;
-					}
-				}
+				case 'd': //llega %d
+					int_value = va_arg(args,int);
+					putd(int_value);
+					i++;
 					break;
-				case '\\':
-					next_char = string[i + 1];
-					if (next_char == 'n') {
-						putc('\n'); //llega /n
-					}	 else {
-						putc('\\'); //llega / seguido de otra cosa
+				case 'c':
+				case 's': //llega %d
+					string_value = va_arg(args,char*);
+					for (j = 0; string_value[j] != '\0'; j++) {
+						putc(string_value[j]);
 					}
+					i++;
+					break;
+				default:
+					putc(string[i]); //llega % seguido de otra cosa
 					break;
 				}
-
 			}
-			i++;
+				break;
+			case '\\':
+				next_char = string[i + 1];
+				if (next_char == 'n') {
+					putc('\n'); //llega /n
+				} else {
+					putc('\\'); //llega / seguido de otra cosa
+				}
+				break;
+			}
 
 		}
-	va_end(args);
+		i++;
 
 	}
+	va_end(args);
+
+}
+
+int streq(char* s, char* t) {
+
+    for(; *s == *t; s++, t++)
+        if (*s == 0)
+            return TRUE;
+
+    return FALSE;
+
+}
+
+//explicar bien funcionamiento y razones
+int sscanf(char * buffer, int cursor, char * command, char * input) {
+	int i, j = 0;
+	for (i = 0; buffer[i] != ' ' && i < 10 && i < cursor; i++) {
+		command[i] = buffer[i];
+	}
+	if (i == 10 && buffer[i] != ' ') {
+		return FALSE;
+	}
+	command[i++] = '\0';
+	if (i != cursor) {
+		for (j; i < cursor; i++, j++) {
+			input[j] = buffer[i];
+		}
+	}
+	input[j] = '\0';
+	return TRUE;
+}

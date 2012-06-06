@@ -51,7 +51,7 @@ kmain() {
 //	}
 	start_shell();
 	//printf("Esto es un nu%mero: %d \nEsto es un c\aracter: %c \nEsto es un string: %s \n",34, "T","hello world");
-	//refresh_screen();
+//	refresh_screen();
 
 	while (1) {
 

@@ -74,7 +74,7 @@ struct key_type * parse_scancode(unsigned char c) {
 		if (c & 0x80) {
 			key->kind == HIDDEN_KEY;
 		} else if (keyboard.alt_state == TRUE && is_terminal_number(c)) {
-			change_terminal(c - 0x3b);
+			change_terminal(c-2);
 		} else if (keyboard.dead_key == TRUE && is_vowel(c)) {
 // TODO hacer para mayusculas tambien
 			switch (c) {
@@ -143,7 +143,7 @@ int is_vowel(unsigned char c) {
 }
 
 int is_terminal_number(unsigned char c) {
-	return (c > 0x02 && c < 0x06) ? 1 : 0;
+	return (c > 0x01 && c < 0x06) ? 1 : 0;
 }
 
 unsigned char get_char_from_keyboard_buffer() {

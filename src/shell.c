@@ -12,12 +12,22 @@ void start_shell() {
 		while ((c = getc()) == -1) {
 			;
 		}
-		putc(c);
-		if (c == '\n') {
+		switch (c) {
+		case '\n':
+			putc(c);
 			parse_command();
 			shell->cursor = 0;
-		} else {
+			break;
+		case '\b':
+			if (shell->cursor != 0) {
+				putc(c);
+				shell->cursor--;
+			}
+			break;
+		default:
+			putc(c);
 			add_to_shell_buffer(c);
+			break;
 		}
 		refresh_screen();
 	}
@@ -42,12 +52,20 @@ void parse_command() {
 	shell_type * shell = vt[current_vt].shell;
 
 	if (shell->cursor != 0) {
-		switch (shell->buffer[0]) {
-		case 'h':
-			printf("Help\n");
-			break;
-		default:
-			printf("Error\n");
+
+		char command[11];
+		char input[shell->cursor];
+
+		int valid_entry = sscanf(shell->buffer, shell->cursor, &command,
+				&input);
+
+		if (valid_entry && streq(command, "echo")) {
+			printf("%s\n", input);
+		} else if (valid_entry && streq(command, "help")) {
+			printf("Pruebe los comandos echo, help, chat, shutdown\n");
+		} else {
+			printf("Invalid command.\n");
 		}
 	}
+
 }
