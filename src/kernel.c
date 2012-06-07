@@ -32,6 +32,9 @@ kmain() {
 	/* Crea la pantalla */
 	setup_vts();
 
+	/* Configura el puerto serie */
+	setup_serial_port();
+
 	/* Carga de entradas en IDT */
 	setup_IDT_content();
 
@@ -70,6 +73,8 @@ void setup_IDT_content() {
 	setup_IDT_entry(&idt[0x09], 0x08, (dword) &_int_09_hand, ACS_INT, 0);
 	//	IRQ2: int80
 	setup_IDT_entry(&idt[0x80], 0x08, (dword) &_int_80_hand, ACS_INT, 0);
+	//	IRQ4: serial port COM2
+	setup_IDT_entry(&idt[0x0C], 0x08, (dword) &_int_0C_hand, ACS_INT, 0);
 }
 
 /**********************************************
@@ -128,16 +133,48 @@ void setup_vts() {
 
 }
 
+/**********************************************
+ setup_serial_port()
+ Inicializa los par‡metros del puerto serie.
+ *************************************************/
+
+void setup_serial_port(){
+	//seteo el bit 7 de LCR para setear baud rate
+	outb(0x2FB, 0x08);
+
+	//seteo el baud rate en LSB
+	outb(0x2F8, 115200 / BAUD);
+
+	//seteo el bit 0 de FCR en 1
+	outb(0x2FA, 0x01);
+
+	//apago dlab
+	outb(0x2FB, 0x00);
+
+
+//	/* seteo las opciones del usuario */
+//	myout (addr + LCR, cant_bits | paridad | stop_bit);
+//
+//	/* FCR */
+//	//myout (addr + FCR, FIFO1);
+//
+//	/* seteo la interrupcion por recepcion de datos */
+//	myout (addr + IER, RI_ON);
+//
+//	myout (addr + MCR, AUX_OUT2_ON);
+//	/* FCR */
+//	myout (addr + FCR, FIFO1);
+//	/* LSR */
+//	//myout (addr + LSR, DATA_READY);
+//
+
+
+}
+
+
 void change_terminal(int number) {
 	if (current_vt != number) {
 		current_vt = number;
 		refresh_screen();
 	}
-}
-
-void deb(unsigned char c) {
-
-	char *monitor = (char *) 0xb8000;
-	monitor[SCREEN_SIZE - WIDTH * 2] = WHITE_TXT;
-	monitor[SCREEN_SIZE - WIDTH * 2 + 1] = c + '0';
 }

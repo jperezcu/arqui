@@ -167,5 +167,12 @@ typedef struct vt_type {
 #define STDIN	0
 #define STDOUT	1
 
+/* Par‡metros para el puerto serie */
+#define BAUD	100
+#define BIT_AMOUNT	0
+#define PARITY	0
+#define STOP_BIT	0
+
+
 #endif
 

@@ -5,7 +5,6 @@ extern int current_vt;
 extern vt_type vt[];
 
 void start_shell() {
-	shell_type * shell = vt[current_vt].shell;
 	char c;
 
 	while (1) {
@@ -16,17 +15,17 @@ void start_shell() {
 		case '\n':
 			putc(c);
 			parse_command();
-			shell->cursor = 0;
+			vt[current_vt].shell->cursor = 0;
 			break;
 		case '\b':
-			if (shell->cursor != 0) {
+			if (vt[current_vt].shell->cursor != 0) {
 				putc(c);
-				shell->cursor--;
+				vt[current_vt].shell->cursor--;
 			}
 			break;
 		default:
 			putc(c);
-			add_to_shell_buffer(c);
+			add_to_vt[current_vt].shell_buffer(c);
 			break;
 		}
 		refresh_screen();
@@ -35,29 +34,25 @@ void start_shell() {
 
 void add_to_shell_buffer(unsigned char c) {
 
-	shell_type * shell = vt[current_vt].shell;
+	vt[current_vt].shell->buffer[vt[current_vt].shell->cursor] = c;
 
-	shell->buffer[shell->cursor] = c;
-
-	if (shell->cursor == SHELL_BUFFER_SIZE - 1) {
-		shell->cursor = 0;
+	if (vt[current_vt].shell->cursor == vt[current_vt].shell_BUFFER_SIZE - 1) {
+		vt[current_vt].shell->cursor = 0;
 	} else {
-		shell->cursor++;
+		vt[current_vt].shell->cursor++;
 	}
 
 }
 
 void parse_command() {
 
-	shell_type * shell = vt[current_vt].shell;
-
-	if (shell->cursor != 0) {
+	if (vt[current_vt].shell->cursor != 0) {
 
 		char command[11];
-		char input[shell->cursor];
+		char input[vt[current_vt].shell->cursor];
 
-		int valid_entry = sscanf(shell->buffer, shell->cursor, &command,
-				&input);
+		int valid_entry = sscanf(vt[current_vt].shell->buffer,
+				vt[current_vt].shell->cursor, &command, &input);
 
 		if (valid_entry && streq(command, "echo")) {
 			printf("%s\n", input);
@@ -68,4 +63,17 @@ void parse_command() {
 		}
 	}
 
+}
+
+void chat_mode() {
+
+
+
+	//habilita interrupcion de puerto serie
+	_mascaraPIC1(0xE8);
+
+
+
+	//deshabilita interrupcion de puerto serie
+	_mascaraPIC1(0xF8);
 }
