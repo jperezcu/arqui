@@ -4,17 +4,6 @@
 DESCR_INT idt[0x100]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
 
-/* Definirá las entradas del IDT */
-void setup_IDT_content();
-
-/* Definirá el IDTR */
-void setup_IDTR();
-
-/* Definirá las terminales virtuales */
-void setup_vts();
-
-void setup_keyboard_buffer();
-
 /**********************************************
  kmain()
  Punto de entrada de c√≥o C.
@@ -49,12 +38,7 @@ kmain() {
 
 	_Sti();
 
-//	for (i = 0; i < SCREEN_SIZE - 2; i++) {
-//		putc('a');
-//	}
 	start_shell();
-	//printf("Esto es un nu%mero: %d \nEsto es un c\aracter: %c \nEsto es un string: %s \n",34, "T","hello world");
-//	refresh_screen();
 
 	while (1) {
 
@@ -73,7 +57,7 @@ void setup_IDT_content() {
 	setup_IDT_entry(&idt[0x09], 0x08, (dword) &_int_09_hand, ACS_INT, 0);
 	//	IRQ2: int80
 	setup_IDT_entry(&idt[0x80], 0x08, (dword) &_int_80_hand, ACS_INT, 0);
-	//	IRQ4: serial port COM2
+	//	IRQ4: serial port COM1
 	setup_IDT_entry(&idt[0x0C], 0x08, (dword) &_int_0C_hand, ACS_INT, 0);
 }
 
@@ -136,41 +120,23 @@ void setup_vts() {
 /**********************************************
  setup_serial_port()
  Inicializa los parámetros del puerto serie.
+ Código de http://wiki.osdev.org/Serial_Ports
  *************************************************/
 
-void setup_serial_port(){
-	//seteo el bit 7 de LCR para setear baud rate
-	outb(0x2FB, 0x08);
+char arriving_buffer[CHAT_BUFFER_SIZE];
+char departing_buffer[CHAT_BUFFER_SIZE];
 
-	//seteo el baud rate en LSB
-	outb(0x2F8, 115200 / BAUD);
+void setup_serial_port() {
 
-	//seteo el bit 0 de FCR en 1
-	outb(0x2FA, 0x01);
-
-	//apago dlab
-	outb(0x2FB, 0x00);
-
-
-//	/* seteo las opciones del usuario */
-//	myout (addr + LCR, cant_bits | paridad | stop_bit);
-//
-//	/* FCR */
-//	//myout (addr + FCR, FIFO1);
-//
-//	/* seteo la interrupcion por recepcion de datos */
-//	myout (addr + IER, RI_ON);
-//
-//	myout (addr + MCR, AUX_OUT2_ON);
-//	/* FCR */
-//	myout (addr + FCR, FIFO1);
-//	/* LSR */
-//	//myout (addr + LSR, DATA_READY);
-//
-
+	_outb(SERIAL_PORT + 1, 0x00); // Disable all interrupts
+	_outb(SERIAL_PORT + 3, 0x80); // Enable DLAB (set baud rate divisor)
+	_outb(SERIAL_PORT + 0, 0x03); // Set divisor to 3 (lo byte) 38400 baud
+	_outb(SERIAL_PORT + 1, 0x00); //                  (hi byte)
+	_outb(SERIAL_PORT + 3, 0x03); // 8 bits, no parity, one stop bit
+	_outb(SERIAL_PORT + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
+	_outb(SERIAL_PORT + 4, 0x0B); // IRQs enabled, RTS/DSR set
 
 }
-
 
 void change_terminal(int number) {
 	if (current_vt != number) {

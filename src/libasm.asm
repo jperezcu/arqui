@@ -101,6 +101,12 @@ _int_80_hand:				; Handler de INT 80
 	pop ebp
 	ret
 
+_int_0C_hand:				; Handler de COM1
+
+	cli
+	call int_0c
+	sti
+
 _system_call:
 
 	push ebp
@@ -138,6 +144,33 @@ EOI:
 	popa
 	sti
 	iret
+
+_inb:
+
+	push ebp
+	mov ebp, esp
+
+	mov edx, [esp+8]
+	mov ecx, [esp+12]
+	in al, dx
+	mov [ecx], al
+
+	mov esp, ebp
+	pop ebp
+	ret
+
+_outb:
+
+	push ebp
+	mov ebp, esp
+
+	mov eax, [esp+12]
+	mov edx, [esp+8]
+	out dx, al
+
+	mov esp, ebp
+	pop ebp
+	ret
 
 ; Debug para el BOCHS, detiene la ejecució; Para continuar colocar en el BOCHSDBG: set $eax=0
 ;

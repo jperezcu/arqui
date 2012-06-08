@@ -3,6 +3,7 @@
 
 extern int current_vt;
 extern struct vt_type vt[];
+int main_screen_size = SCREEN_SIZE;
 
 void print(char c) {
 
@@ -16,7 +17,7 @@ void print(char c) {
 		skip_line();
 		break;
 	default:
-		if (screen->cursor == SCREEN_SIZE) {
+		if (screen->cursor == main_screen_size) {
 			move_screen();
 		}
 
@@ -24,6 +25,28 @@ void print(char c) {
 		screen->content[screen->cursor++] = WHITE_TXT;
 		break;
 	}
+}
+
+void change_main_screen_size(int i) {
+	main_screen_size -= i;
+}
+
+void print_lower_screen(char c) {
+	int cursor = main_screen_size + 1;
+
+	switch (c) {
+		case '\b':
+			del();
+			break;
+		default:
+			if (screen->cursor == main_screen_size) {
+				move_screen();
+			}
+
+			screen->content[screen->cursor++] = c;
+			screen->content[screen->cursor++] = WHITE_TXT;
+			break;
+
 }
 
 void del() {

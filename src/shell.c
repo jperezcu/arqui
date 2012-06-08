@@ -3,14 +3,18 @@
 
 extern int current_vt;
 extern vt_type vt[];
+extern char * departing_buffer;
+extern char * arriving_buffer;
+
+int received_serial = FALSE;
+int received_serial_char;
 
 void start_shell() {
 	char c;
 
 	while (1) {
-		while ((c = getc()) == -1) {
+		while ((c = getc()) == -1)
 			;
-		}
 		switch (c) {
 		case '\n':
 			putc(c);
@@ -67,13 +71,51 @@ void parse_command() {
 
 void chat_mode() {
 
-
-
 	//habilita interrupcion de puerto serie
 	_mascaraPIC1(0xE8);
 
+	int departing_cursor = 0;
+	int arriving_cursor = 0;
+	char c;
+
+	while (1) {
+		if (received_serial == TRUE) {
+			if (received_serial_char == '\n') {
+				print_arriving_buffer(arriving_cursor);
+				arriving_cursor = 0;
+			} else {
+				arriving_buffer[arriving_cursor] = received_serial_char;
+				arriving_cursor++;
+			}
+		}
+		if ((c = getc()) != -1) {
+			switch (c) {
+			case '\n':
+				//borrar pantalla low
+				send_departing_buffer(departing_cursor);
+				departing_cursor = 0;
+				break;
+			case '\b':
+				if (departing_cursor != 0) {
+					putc_lower_screen(c);
+					departing_cursor--;
+				}
+				break;
+			default:
+				if (departing_cursor < CHAT_BUFFER_SIZE ) {
+					putc_lower_screen(c);
+					departing_buffer[departing_cursor] = received_serial_char;
+					departing_cursor++;
+				}
+				break;
+			}
+		}
+	}
 
 
-	//deshabilita interrupcion de puerto serie
+
+//deshabilita interrupcion de puerto serie
+
 	_mascaraPIC1(0xF8);
+
 }
