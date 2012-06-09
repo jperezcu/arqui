@@ -1,5 +1,7 @@
 #include "../include/kasm.h"
 #include "../include/defs.h"
+#include "../include/kernel.h"
+
 
 DESCR_INT idt[0x100]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
@@ -14,7 +16,7 @@ kmain() {
 	int i, num;
 
 	/* Borra la pantalla. */
-	k_clear_screen();
+	//k_clear_screen();
 
 	setup_keyboard_buffer();
 
@@ -37,6 +39,7 @@ kmain() {
 	_mascaraPIC2(0xFF);
 
 	_Sti();
+	refresh_screen();
 
 	start_shell();
 
@@ -95,7 +98,7 @@ void setup_keyboard_buffer() {
 
 struct screen_type screen[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
 
-struct shell_type shell[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
+struct shell_type shell[VT_AMOUNT] = { { 0 , 0} ,{ 0 , 0}, { 0 , 0 }, { 0 , 0 } };
 
 struct vt_type vt[VT_AMOUNT] = { { &screen[0], &shell[0] }, { &screen[1],
 		&shell[1] }, { &screen[2], &shell[2] }, { &screen[3], &shell[3] } };
@@ -105,6 +108,7 @@ int current_vt = 0;
 void setup_vts() {
 	int i, j;
 	for (i = 0; i < VT_AMOUNT; i++) {
+		vt[i].screen->chat_cursor=LOWER_SCREEN;
 		for (j = 0; j < SCREEN_SIZE; j++) {
 			vt[i].screen->content[j++] = 0;
 			vt[i].screen->content[j] = WHITE_TXT;

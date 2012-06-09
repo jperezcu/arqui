@@ -46,6 +46,11 @@ void putc(unsigned char c) {
 	_system_call(WRITE, STDOUT, &c_copy, 1);
 }
 
+void putc_lower_screen(unsigned char c){
+	char c_copy=c;
+	_system_call(WRITE, STDOUT_LOW, &c_copy,1);
+}
+
 void putd(long int d) {
 	int i = 31;
 	char aux[32];
@@ -76,6 +81,12 @@ void write(int device, char * buffer, int amount) {
 		int i;
 		for (i = 0; i < amount; i++) {
 			print(buffer[i]);
+		}
+	}
+	if(device == STDOUT_LOW){
+		int i;
+		for(i = 0; i< amount; i++){
+			print_lower_screen(buffer[i]);
 		}
 	}
 }
@@ -174,3 +185,5 @@ int sscanf(char * buffer, int cursor, char * command, char * input) {
 	input[j] = '\0';
 	return TRUE;
 }
+
+	

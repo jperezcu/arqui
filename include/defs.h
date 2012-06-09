@@ -134,10 +134,12 @@ typedef struct key_type {
 #define SCREEN_SIZE WIDTH*HEIGHT*2
 #define LAST_LINE_BEGIN WIDTH*(HEIGHT-1)*2
 #define LAST_LINE_END SCREEN_SIZE-1
+#define LOWER_SCREEN WIDTH*(HEIGHT-4)*2
 
 /* Pantalla */
 typedef struct screen_type {
 	int cursor;
+	int chat_cursor;
 	char content[SCREEN_SIZE];
 } screen_type;
 
@@ -166,11 +168,12 @@ typedef struct vt_type {
 /* Device para la int 80 */
 #define STDIN	0
 #define STDOUT	1
+#define STDOUT_LOW 2
 
 /* Direcci—n del puerto serie */
 #define SERIAL_PORT	0X3F8
 
-#define CHAT_BUFFER_SIZE	100
+#define CHAT_BUFFER_SIZE	200
 
 #endif
 

@@ -19,6 +19,9 @@ void		_Sti(void);	 /* Habilita interrupciones  */
 void		_int_08_hand();      /* Timer tick */
 void		_int_09_hand();      /* Keyboard */
 void		_int_80_hand();      /* Software */
+void		_int_0C_hand();      /* Puerto Serie*/
+void		_outb(int addres, char data);
+void		_inb(int addres, int data);
 
 void		_debug (void);
 

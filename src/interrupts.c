@@ -1,6 +1,8 @@
 #include "../include/defs.h"
 
 extern int tickpos;
+extern int received_serial;
+extern int received_serial_char;
 
 /**********************************************
  int_08()
@@ -51,7 +53,7 @@ void int_80(int service_number, int device, char * buffer, int amount) {
 void int_0C() {
 	int ans;
 
-	inb(SERIAL_PORT,&ans);
+	_inb(SERIAL_PORT,&ans);
 	received_serial_char = ans;
 	received_serial = TRUE;
 }

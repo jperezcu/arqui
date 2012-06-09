@@ -2,13 +2,17 @@ GLOBAL  _read_msw,_lidt
 GLOBAL  _int_08_hand
 GLOBAL  _int_09_hand
 GLOBAL  _int_80_hand
+GLOBAL  _int_0C_hand
 GLOBAL  _system_call
+GLOBAL  _outb
+GLOBAL  _inb
 GLOBAL  _mascaraPIC1,_mascaraPIC2,_Cli,_Sti
 GLOBAL  _debug
 
 EXTERN  int_08
 EXTERN  int_09
 EXTERN  int_80
+EXTERN  int_0C
 
 
 SECTION .text
@@ -101,11 +105,19 @@ _int_80_hand:				; Handler de INT 80
 	pop ebp
 	ret
 
-_int_0C_hand:				; Handler de COM1
+_int_0C_hand:	; Handler de COM1
 
+
+	push ebp
+	mov ebp, esp
+	
 	cli
-	call int_0c
+	call int_0C
 	sti
+	
+	mov esp, ebp
+	pop ebp
+	ret
 
 _system_call:
 
