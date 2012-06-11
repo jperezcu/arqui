@@ -1,8 +1,8 @@
 #include "../include/defs.h"
 
 extern int tickpos;
-extern int received_serial;
-extern int received_serial_char;
+int received_serial = FALSE;
+int received_serial_char;
 
 /**********************************************
  int_08()
@@ -43,4 +43,19 @@ void int_80(int service_number, int device, char * buffer, int amount) {
 	default:
 		break;
 	}
+}
+
+/**********************************************
+ int_0C()
+ Atenci—n de puerto serie
+ *************************************************/
+
+void int_0C() {
+	int ans;
+
+	_Cli();
+	_inb(SERIAL_PORT,&ans);
+	received_serial_char = ans;
+	_Sti();
+	received_serial = TRUE;
 }

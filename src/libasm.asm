@@ -1,6 +1,7 @@
 GLOBAL  _read_msw,_lidt
 GLOBAL  _int_08_hand
 GLOBAL  _int_09_hand
+GLOBAL  _int_0C_hand
 GLOBAL  _int_80_hand
 GLOBAL  _system_call
 GLOBAL  _outb
@@ -10,6 +11,7 @@ GLOBAL  _debug
 
 EXTERN  int_08
 EXTERN  int_09
+EXTERN  int_0C
 EXTERN  int_80
 
 
@@ -75,6 +77,22 @@ _int_09_hand:				; Handler de INT 9 (Keyboard)
 	pop	eax
 
 	jmp	EOI					; Envio de EOI generico al PIC
+
+_int_0C_hand:				; Handler de COM1
+
+        push    ds
+        push    es              ; Se salvan los registros
+        pusha                   ; Carga de DS y ES con el valor del selector
+        mov     ax, 10h			; a utilizar.
+        mov     ds, ax
+        mov     es, ax
+        call    int_0C
+        mov	al,20h			; Envio de EOI generico al PIC
+		out	20h,al
+		popa
+        pop     es
+        pop     ds
+        iret
 
 _int_80_hand:				; Handler de INT 80
 
@@ -145,6 +163,9 @@ _inb:
 
 	push ebp
 	mov ebp, esp
+
+	;mov dx, [esp+4]
+	;in al, dx
 
 	mov edx, [esp+8]
 	mov ecx, [esp+12]

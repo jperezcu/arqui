@@ -5,6 +5,9 @@
 DESCR_INT idt[0x100]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
 
+extern int received_serial;
+extern int received_serial_char;
+
 /**********************************************
  kmain()
  Punto de entrada de cóo C.
@@ -37,7 +40,20 @@ kmain() {
 
 	_Sti();
 
-	shell_mode();
+	_mascaraPIC1(0xEC);
+	char *monitor = (char *) 0xb8000;
+
+	monitor[SCREEN_SIZE - 2] = 'f';
+	monitor[SCREEN_SIZE - 1] = WHITE_TXT;
+
+	while (received_serial == FALSE)
+		;
+
+	monitor[SCREEN_SIZE - 2] = 't';
+	monitor[SCREEN_SIZE - 1] = WHITE_TXT;
+	_mascaraPIC1(0xF8);
+
+//	shell_mode();
 
 }
 
@@ -53,6 +69,8 @@ void setup_IDT_content() {
 	setup_IDT_entry(&idt[0x09], 0x08, (dword) &_int_09_hand, ACS_INT, 0);
 	//	IRQ2: int80
 	setup_IDT_entry(&idt[0x80], 0x08, (dword) &_int_80_hand, ACS_INT, 0);
+	//	IRQ4: serial port COM1
+	setup_IDT_entry(&idt[0x0C], 0x08, (dword) &_int_0C_hand, ACS_INT, 0);
 }
 
 /**********************************************
@@ -72,7 +90,7 @@ void setup_IDTR() {
  Inicializa el teclado.
  *************************************************/
 
-struct keyboard_type keyboard = { ENGLISH, FALSE, FALSE, FALSE, FALSE, FALSE,
+struct keyboard_type keyboard = { SPANISH, FALSE, FALSE, FALSE, FALSE, FALSE,
 		FALSE, 0, 0 };
 
 void setup_keyboard_buffer() {

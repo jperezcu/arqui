@@ -13,13 +13,13 @@ void shell_mode() {
 	char arriving_char;
 	char c;
 
-	refresh_screen();
+	print_initial_prompt_lines();
 
 	while (1) {
 
-		if (current_vt == CHAT_VT) {
-//			arriving_char = read_serial();
-//			parse_arriving_char(arriving_char);
+		if (current_vt == CHAT_VT && serial_received()) {
+			arriving_char = read_serial();
+			parse_arriving_char(arriving_char);
 		}
 
 		while ((c = getc()) == -1)
@@ -35,30 +35,36 @@ void shell_mode() {
 	}
 }
 
+void print_initial_prompt_lines() {
+	for (; current_vt < 3; current_vt++) {
+		printf("guest@J2OS-terminal-%d:/$ ", current_vt + 1);
+	}
+	current_vt = 0;
+	refresh_screen();
+}
+
 void print_on_main_screen(int cursor) {
 	int i;
 	int lines;
 	int aux;
-	lines= (cursor/WIDTH)+1;
-	aux=vt[current_vt].screen->cursor + (lines*WIDTH*2);
-	if(aux>=LOWER_SCREEN){
-		aux= ((aux-LOWER_SCREEN)/(2*WIDTH));
-		printf("%d",aux);
-		
+	lines = (cursor / WIDTH) + 1;
+	aux = vt[current_vt].screen->cursor + (lines * WIDTH * 2);
+	if (aux >= LOWER_SCREEN) {
+		aux = ((aux - LOWER_SCREEN) / (2 * WIDTH));
+		printf("%d", aux);
+
 	}
-	if(vt[current_vt].screen->cursor>= LOWER_SCREEN){
-		for(i=0; i<aux; i++){
+	if (vt[current_vt].screen->cursor >= LOWER_SCREEN) {
+		for (i = 0; i < aux; i++) {
 			move_screen(LOWER_SCREEN);
 		}
-		vt[current_vt].screen->cursor= LOWER_SCREEN-(2*WIDTH*lines);
+		vt[current_vt].screen->cursor = LOWER_SCREEN - (2 * WIDTH * lines);
 	}
 	for (i = 0; i < cursor; i++) {
 		putc(departing_buffer[i]);
 	}
 	putc('\n');
-	
-	
-	
+
 }
 
 int serial_received() {
@@ -66,9 +72,6 @@ int serial_received() {
 }
 
 char read_serial() {
-	while (serial_received() == 0)
-		;
-
 	return _inb(SERIAL_PORT);
 }
 
@@ -88,10 +91,11 @@ int is_transmit_empty() {
 
 void parse_departing_char(char c) {
 	switch (c) {
-	case '\n':		
+	case '\n':
 		print_on_main_screen(departing_cursor);
 		clear_lower_screen();
-		//send_departing_buffer(departing_cursor);
+		departing_buffer[departing_cursor++] = c;
+		send_departing_buffer(departing_cursor);
 		departing_cursor = 0;
 		break;
 	case '\b':
@@ -129,7 +133,7 @@ void parse_command_char(char c) {
 		putc(c);
 		parse_command();
 		vt[current_vt].shell->cursor = 0;
-		printf("guest@J2OS-terminal-%d:/$ ",current_vt+1);
+		printf("guest@J2OS-terminal-%d:/$ ", current_vt + 1);
 		break;
 	case '\b':
 		if (vt[current_vt].shell->cursor != 0) {
