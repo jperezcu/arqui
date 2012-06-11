@@ -31,7 +31,6 @@ void change_main_screen_size(int i) {
 	main_screen_size -= i;
 }
 
-
 //problemas con el cursor
 void del() {
 
@@ -46,8 +45,8 @@ void del() {
 	}
 
 }
-void del_lower_screen(){
-	
+void del_lower_screen() {
+
 	screen_type * screen = vt[current_vt].screen;
 	if (screen->chat_cursor != LOWER_SCREEN) {
 
@@ -56,7 +55,6 @@ void del_lower_screen(){
 
 		screen->chat_cursor -= 2;
 	}
-
 
 }
 void skip_line() {
@@ -82,8 +80,12 @@ void refresh_screen() {
 
 	int i;
 	for (i = 0; i < SCREEN_SIZE - 2; i++) {
-		monitor[i] = screen->content[i];
+		monitor[i] = vt[current_vt].screen->content[i];
 	}
+
+	int position = (current_vt == CHAT_VT) ? screen->chat_cursor : screen->cursor;
+
+	update_cursor(position/2);
 }
 
 void move_screen(int screen_size) {
@@ -99,34 +101,45 @@ void move_screen(int screen_size) {
 		screen->content[i++] = WHITE_TXT;
 	}
 
-	screen->cursor = (screen_size - (WIDTH*2));
+	screen->cursor = (screen_size - (WIDTH * 2));
 }
 
-
-void clear_lower_screen(){
-	int i=0;
+void clear_lower_screen() {
+	int i = 0;
 	screen_type * screen = vt[current_vt].screen;
-	for(i=LOWER_SCREEN; i< screen->chat_cursor;){
-		screen->content[i++]=' ';
-		screen->content[i++]= WHITE_TXT;
+	for (i = LOWER_SCREEN; i < screen->chat_cursor;) {
+		screen->content[i++] = ' ';
+		screen->content[i++] = WHITE_TXT;
 	}
-	vt[current_vt].screen->chat_cursor=LOWER_SCREEN;
+	vt[current_vt].screen->chat_cursor = LOWER_SCREEN;
 }
-	
+
 void print_lower_screen(char c) {
+
 	screen_type * screen = vt[current_vt].screen;
-	
+
 	switch (c) {
-		case '\b':
-			del_lower_screen();
-			break;
-		default:
-			screen->content[screen->chat_cursor++] = c;
-			screen->content[screen->chat_cursor++] = WHITE_TXT;
-			break;
-		}
-	if(vt[current_vt].screen->chat_cursor==CHAT_BUFFER_SIZE){
-		vt[current_vt].screen->chat_cursor =LOWER_SCREEN;
+	case '\b':
+		del_lower_screen();
+		break;
+	default:
+		screen->content[screen->chat_cursor++] = c;
+		screen->content[screen->chat_cursor++] = WHITE_TXT;
+		break;
+	}
+	if (screen->chat_cursor == CHAT_BUFFER_SIZE) {
+		screen->chat_cursor = LOWER_SCREEN;
 	}
 
+}
+
+void update_cursor(int position) {
+
+	// parte baja del puerto del cursor
+	_outb(0x3D4, 0x0F);
+	_outb(0x3D5, (unsigned char) (position & 0xFF));
+
+	// parte alta del puerto del cursor
+	_outb(0x3D4, 0x0E);
+	_outb(0x3D5, (unsigned char) ((position >> 8) & 0xFF));
 }

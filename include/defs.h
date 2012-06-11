@@ -173,6 +173,8 @@ typedef struct vt_type {
 /* Direcci—n del puerto serie */
 #define SERIAL_PORT	0X3F8
 
+#define CHAT_VT 3
+
 #define CHAT_BUFFER_SIZE	200
 
 #endif

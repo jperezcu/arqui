@@ -15,12 +15,10 @@ kmain() {
 
 	int i, num;
 
-	/* Borra la pantalla. */
-	//k_clear_screen();
-
+	/* Prepara el buffer de teclado */
 	setup_keyboard_buffer();
 
-	/* Crea la pantalla */
+	/* Crea las terminales virtuales */
 	setup_vts();
 
 	/* Configura el puerto serie */
@@ -43,9 +41,6 @@ kmain() {
 
 	start_shell();
 
-	while (1) {
-
-	}
 }
 
 /**********************************************
@@ -146,5 +141,10 @@ void change_terminal(int number) {
 	if (current_vt != number) {
 		current_vt = number;
 		refresh_screen();
+		if(number == CHAT_VT){
+			chat_mode();
+		} else {
+			start_shell();
+		}
 	}
 }

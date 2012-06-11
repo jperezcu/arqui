@@ -14,5 +14,6 @@ void skip_line();
 void print_lower_screen(char c);
 void clear_lower_screen();
 void change_main_screen_size(int i);
+void update_cursor();
 
 #endif

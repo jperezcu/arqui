@@ -11,7 +11,6 @@ int received_serial_char;
 
 void start_shell() {
 	char c;
-
 	while (1) {
 		while ((c = getc()) == -1)
 			;
@@ -50,7 +49,7 @@ void add_to_shell_buffer(unsigned char c) {
 
 void parse_command() {
 	if (vt[current_vt].shell->cursor != 0) {
-		
+
 		char command[11];
 		char input[vt[current_vt].shell->cursor];
 
@@ -61,16 +60,16 @@ void parse_command() {
 			printf("%s\n", input);
 		} else if (valid_entry && streq(command, "help")) {
 			printf("Pruebe los comandos echo, help, chat, shutdown\n");
-		} else if( valid_entry && streq(command, "chat")){
-			k_clear_screen();
-			int i;
-			for(i=0; i< SCREEN_SIZE;i++){
-				vt[current_vt].screen->content[i++]=' ';
-				vt[current_vt].screen->content[i]=WHITE_TXT; // hacer clear screen
-			}
-			vt[current_vt].screen->cursor=0;
-			refresh_screen();
-			chat_mode();
+//		} else if (valid_entry && streq(command, "chat")) {
+//			k_clear_screen();
+//			int i;
+//			for (i = 0; i < SCREEN_SIZE; i++) {
+//				vt[current_vt].screen->content[i++] = ' ';
+//				vt[current_vt].screen->content[i] = WHITE_TXT; // hacer clear screen
+//			}
+//			vt[current_vt].screen->cursor = 0;
+//			refresh_screen();
+//			chat_mode();
 		} else {
 			printf("Invalid command.\n");
 		}
@@ -79,15 +78,15 @@ void parse_command() {
 }
 
 void chat_mode() {
-	_Cli();
+
 	//habilita interrupcion de puerto serie
 	//_mascaraPIC1(0xE8);
 
 	int departing_cursor = 0;
 	int arriving_cursor = 0;
 	char c;
+
 	while (1) {
-	//printf("despues",c);
 		if (received_serial == TRUE) {
 			if (received_serial_char == '\n') {
 				print_on_main_screen(arriving_cursor);
@@ -97,12 +96,12 @@ void chat_mode() {
 				arriving_cursor++;
 			}
 		}
-		c = getc();		
-		//printf("Entro al %s",c);
+		c = getc();
 		if (c != -1) {
+			printf("getc del chat anduvo");
 			switch (c) {
 			case '\n':
-				clear_lower_screen(); 
+				clear_lower_screen();
 				print_on_main_screen(departing_cursor);
 				//send_departing_buffer(departing_cursor);
 				departing_cursor = 0;
@@ -114,7 +113,7 @@ void chat_mode() {
 				}
 				break;
 			default:
-				if (departing_cursor < CHAT_BUFFER_SIZE ) {
+				if (departing_cursor < CHAT_BUFFER_SIZE) {
 					putc_lower_screen(c);
 					departing_buffer[departing_cursor] = c;
 					departing_cursor++;
@@ -124,8 +123,6 @@ void chat_mode() {
 		}
 		refresh_screen();
 	}
-	_Sti();
-
 
 //deshabilita interrupcion de puerto serie
 
@@ -133,20 +130,20 @@ void chat_mode() {
 
 }
 
-void print_on_main_screen(int cursor){
+void print_on_main_screen(int cursor) {
 	int i;
-	for(i=0; i<cursor; i++){
+	for (i = 0; i < cursor; i++) {
 		putc(departing_buffer[i]);
 	}
 	putc('\n');
 }
 
-void send_departing_buffer(int cursor){
-	int i=0;
-	for(i=0; i< cursor;i++){
+void send_departing_buffer(int cursor) {
+	int i = 0;
+	for (i = 0; i < cursor; i++) {
 		_Cli();
-		_outb(SERIAL_PORT,departing_buffer[i]); //no quiero ser interrumpido mientras escribo en el P.S
+		_outb(SERIAL_PORT, departing_buffer[i]); //no quiero ser interrumpido mientras escribo en el P.S
 		_Sti();
 	}
 }
-	
+
