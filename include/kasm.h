@@ -21,7 +21,7 @@ void		_int_09_hand();      /* Keyboard */
 void		_int_80_hand();      /* Software */
 void		_int_0C_hand();      /* Puerto Serie*/
 void		_outb(int addres, char data);
-void		_inb(int addres, int data);
+char		_inb(int address);
 
 void		_debug (void);
 

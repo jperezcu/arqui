@@ -35,23 +35,22 @@ kmain() {
 	_Cli();
 
 	/* Habilita interrupciones en el PIC */
-	_mascaraPIC1(0xF8);
+	_mascaraPIC1(KEYBOARD & TIMER_TICK & SERIAL_PORT);
 	_mascaraPIC2(0xFF);
 
 	_Sti();
 
-	_mascaraPIC1(0xEC);
 	char *monitor = (char *) 0xb8000;
 
-	monitor[SCREEN_SIZE - 2] = 'f';
-	monitor[SCREEN_SIZE - 1] = WHITE_TXT;
+	monitor[LOWER_SCREEN] = 'p';
+	monitor[LOWER_SCREEN + 1] = WHITE_TXT;
 
-	while (received_serial == FALSE)
-		;
-
-	monitor[SCREEN_SIZE - 2] = 't';
-	monitor[SCREEN_SIZE - 1] = WHITE_TXT;
-	_mascaraPIC1(0xF8);
+	while (1) {
+		if (received_serial == TRUE) {
+			monitor[LOWER_SCREEN] = received_serial_char;
+			monitor[LOWER_SCREEN + 1] = WHITE_TXT;
+		}
+	}
 
 //	shell_mode();
 
@@ -143,13 +142,16 @@ int arriving_cursor = 0;
 
 void setup_serial_port() {
 
-	_outb(SERIAL_PORT + 1, 0x00); // Disable all interrupts
-	_outb(SERIAL_PORT + 3, 0x80); // Enable DLAB (set baud rate divisor)
-	_outb(SERIAL_PORT + 0, 0x03); // Set divisor to 3 (lo byte) 38400 baud
-	_outb(SERIAL_PORT + 1, 0x00); //                  (hi byte)
-	_outb(SERIAL_PORT + 3, 0x03); // 8 bits, no parity, one stop bit
-	_outb(SERIAL_PORT + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
-	_outb(SERIAL_PORT + 4, 0x0B); // IRQs enabled, RTS/DSR set
+	_outb(COM1 + 1, 0x00); // Disable all interrupts
+	_outb(COM1 + 3, 0x80); // Enable DLAB (set baud rate divisor)
+	_outb(COM1 + 0, 0x03); // Set divisor to 3 (lo byte) 38400 baud
+	_outb(COM1 + 1, 0x00); //                  (hi byte)
+	_outb(COM1 + 3, 0x03); // 8 bits, no parity, one stop bit
+	_outb(COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
+	_outb(COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
+
+	_outb(0x21, (_inb(0x21) & 0xF7));
+	_outb(COM1 + 1, 0x01);
 
 }
 

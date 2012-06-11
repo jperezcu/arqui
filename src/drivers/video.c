@@ -104,6 +104,16 @@ void move_screen(int screen_size) {
 	screen->cursor = (screen_size - (WIDTH * 2));
 }
 
+void clear() {
+	int i = 0;
+	screen_type * screen = vt[current_vt].screen;
+	for (i = 0; i < screen->cursor;) {
+		screen->content[i++] = ' ';
+		screen->content[i++] = WHITE_TXT;
+	}
+	vt[current_vt].screen->cursor = 0;
+}
+
 void clear_lower_screen() {
 	int i = 0;
 	screen_type * screen = vt[current_vt].screen;

@@ -172,7 +172,13 @@ typedef struct vt_type {
 #define STDOUT_LOW 2
 
 /* Direcci—n del puerto serie */
-#define SERIAL_PORT	0X3F8
+#define COM1	0X3F8
+
+#define KEYBOARD 0xFE
+#define TIMER_TICK 0xFD
+#define SERIAL_PORT 0xEF
+
+/* chat */
 
 #define CHAT_VT 3
 

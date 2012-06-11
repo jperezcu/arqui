@@ -8,6 +8,9 @@ extern char arriving_buffer[CHAT_BUFFER_SIZE];
 extern int departing_cursor;
 extern int arriving_cursor;
 
+extern int received_serial;
+extern char received_serial_char;
+
 void shell_mode() {
 
 	char arriving_char;
@@ -17,9 +20,8 @@ void shell_mode() {
 
 	while (1) {
 
-		if (current_vt == CHAT_VT && serial_received()) {
-			arriving_char = read_serial();
-			parse_arriving_char(arriving_char);
+		if (current_vt == CHAT_VT && received_serial) {
+			parse_arriving_char(received_serial_char);
 		}
 
 		while ((c = getc()) == -1)
@@ -68,11 +70,11 @@ void print_on_main_screen(int cursor) {
 }
 
 int serial_received() {
-	return _inb(SERIAL_PORT + 5) & 1;
+	return _inb(COM1 + 5) & 1;
 }
 
 char read_serial() {
-	return _inb(SERIAL_PORT);
+	return _inb(COM1);
 }
 
 void parse_arriving_char(char arriving_char) {
@@ -86,7 +88,7 @@ void parse_arriving_char(char arriving_char) {
 }
 
 int is_transmit_empty() {
-	return _inb(SERIAL_PORT + 5) & 0x20;
+	return _inb(COM1 + 5) & 0x20;
 }
 
 void parse_departing_char(char c) {
@@ -172,7 +174,13 @@ void parse_command() {
 		if (valid_entry && streq(command, "echo")) {
 			printf("%s\n", input);
 		} else if (valid_entry && streq(command, "help")) {
-			printf("Pruebe los comandos echo, help, chat, shutdown\n");
+			printf("\nPruebe los siguientes comandos:\n\n");
+			printf("echo <mensaje> - imprime el mensaje en la terminal actual.\n\n");
+			printf("clear - borra el contenido de la terminal actual.\n\n");
+			printf("Cambie de terminal presionando ALT + 1 (o 2 o 3 o 4). \n\n");
+			printf("Entre al modo chat en la terminal 4 presionando ALT + 4.\n\n");
+		} else if (valid_entry && streq(command, "clear")) {
+			clear();
 		} else {
 			printf("Invalid command.\n");
 		}

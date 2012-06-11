@@ -50,12 +50,10 @@ void int_80(int service_number, int device, char * buffer, int amount) {
  Atenci—n de puerto serie
  *************************************************/
 
-void int_0C() {
-	int ans;
+void int_0C(char c) {
 
 	_Cli();
-	_inb(SERIAL_PORT,&ans);
-	received_serial_char = ans;
+	received_serial_char = c;
 	_Sti();
 	received_serial = TRUE;
 }

@@ -83,10 +83,13 @@ _int_0C_hand:				; Handler de COM1
         push    ds
         push    es              ; Se salvan los registros
         pusha                   ; Carga de DS y ES con el valor del selector
-        mov     ax, 10h			; a utilizar.
-        mov     ds, ax
-        mov     es, ax
-        call    int_0C
+
+		mov eax, 0
+		mov dx, 03F8h
+        in al, dx
+        push ax
+        call int_0C
+
         mov	al,20h			; Envio de EOI generico al PIC
 		out	20h,al
 		popa
@@ -164,13 +167,14 @@ _inb:
 	push ebp
 	mov ebp, esp
 
-	;mov dx, [esp+4]
-	;in al, dx
-
-	mov edx, [esp+8]
-	mov ecx, [esp+12]
+	push dx
+	mov dx, [esp+12]
 	in al, dx
-	mov [ecx], al
+
+;	mov edx, [esp+8]
+;	mov ecx, [esp+12]
+;	in al, dx
+;	mov [ecx], al
 
 	mov esp, ebp
 	pop ebp
