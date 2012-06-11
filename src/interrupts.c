@@ -44,16 +44,3 @@ void int_80(int service_number, int device, char * buffer, int amount) {
 		break;
 	}
 }
-
-/**********************************************
- int_0C()
- Atenci—n de puerto serie
- *************************************************/
-
-void int_0C() {
-	int ans;
-
-	_inb(SERIAL_PORT,&ans);
-	received_serial_char = ans;
-	received_serial = TRUE;
-}

@@ -2,7 +2,6 @@
 #include "../include/defs.h"
 #include "../include/kernel.h"
 
-
 DESCR_INT idt[0x100]; /* IDT de 10 entradas */
 IDTR idtr; /* IDTR */
 
@@ -37,9 +36,8 @@ kmain() {
 	_mascaraPIC2(0xFF);
 
 	_Sti();
-	refresh_screen();
 
-	start_shell();
+	shell_mode();
 
 }
 
@@ -55,8 +53,6 @@ void setup_IDT_content() {
 	setup_IDT_entry(&idt[0x09], 0x08, (dword) &_int_09_hand, ACS_INT, 0);
 	//	IRQ2: int80
 	setup_IDT_entry(&idt[0x80], 0x08, (dword) &_int_80_hand, ACS_INT, 0);
-	//	IRQ4: serial port COM1
-	setup_IDT_entry(&idt[0x0C], 0x08, (dword) &_int_0C_hand, ACS_INT, 0);
 }
 
 /**********************************************
@@ -93,7 +89,7 @@ void setup_keyboard_buffer() {
 
 struct screen_type screen[VT_AMOUNT] = { { 0 }, { 0 }, { 0 }, { 0 } };
 
-struct shell_type shell[VT_AMOUNT] = { { 0 , 0} ,{ 0 , 0}, { 0 , 0 }, { 0 , 0 } };
+struct shell_type shell[VT_AMOUNT] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } };
 
 struct vt_type vt[VT_AMOUNT] = { { &screen[0], &shell[0] }, { &screen[1],
 		&shell[1] }, { &screen[2], &shell[2] }, { &screen[3], &shell[3] } };
@@ -103,7 +99,7 @@ int current_vt = 0;
 void setup_vts() {
 	int i, j;
 	for (i = 0; i < VT_AMOUNT; i++) {
-		vt[i].screen->chat_cursor=LOWER_SCREEN;
+		vt[i].screen->chat_cursor = LOWER_SCREEN;
 		for (j = 0; j < SCREEN_SIZE; j++) {
 			vt[i].screen->content[j++] = 0;
 			vt[i].screen->content[j] = WHITE_TXT;
@@ -124,6 +120,8 @@ void setup_vts() {
 
 char arriving_buffer[CHAT_BUFFER_SIZE];
 char departing_buffer[CHAT_BUFFER_SIZE];
+int departing_cursor = 0;
+int arriving_cursor = 0;
 
 void setup_serial_port() {
 
@@ -141,10 +139,5 @@ void change_terminal(int number) {
 	if (current_vt != number) {
 		current_vt = number;
 		refresh_screen();
-		if(number == CHAT_VT){
-			chat_mode();
-		} else {
-			start_shell();
-		}
 	}
 }

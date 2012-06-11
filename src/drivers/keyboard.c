@@ -41,6 +41,8 @@ struct key_type * parse_scancode(unsigned char c) {
 	key->kind = HIDDEN_KEY;
 
 	switch (c) {
+	case CONTROL_PRESSED:
+		break;
 	case CAPSLOCK:
 		keyboard.caps_state = !keyboard.caps_state;
 		break;
