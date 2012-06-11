@@ -37,10 +37,28 @@ void shell_mode() {
 
 void print_on_main_screen(int cursor) {
 	int i;
+	int lines;
+	int aux;
+	lines= (cursor/WIDTH)+1;
+	aux=vt[current_vt].screen->cursor + (lines*WIDTH*2);
+	if(aux>=LOWER_SCREEN){
+		aux= ((aux-LOWER_SCREEN)/(2*WIDTH));
+		printf("%d",aux);
+		
+	}
+	if(vt[current_vt].screen->cursor>= LOWER_SCREEN){
+		for(i=0; i<aux; i++){
+			move_screen(LOWER_SCREEN);
+		}
+		vt[current_vt].screen->cursor= LOWER_SCREEN-(2*WIDTH*lines);
+	}
 	for (i = 0; i < cursor; i++) {
 		putc(departing_buffer[i]);
 	}
 	putc('\n');
+	
+	
+	
 }
 
 int serial_received() {
@@ -70,9 +88,9 @@ int is_transmit_empty() {
 
 void parse_departing_char(char c) {
 	switch (c) {
-	case '\n':
-		clear_lower_screen();
+	case '\n':		
 		print_on_main_screen(departing_cursor);
+		clear_lower_screen();
 		//send_departing_buffer(departing_cursor);
 		departing_cursor = 0;
 		break;

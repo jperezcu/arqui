@@ -96,7 +96,7 @@ void move_screen(int screen_size) {
 	for (i = 0, j = (WIDTH * 2); j < screen_size; i++, j++) {
 		screen->content[i] = screen->content[j];
 	}
-	while (i < SCREEN_SIZE) {
+	while (i < SCREEN_SIZE) { 
 		screen->content[i++] = ' ';
 		screen->content[i++] = WHITE_TXT;
 	}

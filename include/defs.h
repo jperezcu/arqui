@@ -135,6 +135,7 @@ typedef struct key_type {
 #define LAST_LINE_BEGIN WIDTH*(HEIGHT-1)*2
 #define LAST_LINE_END SCREEN_SIZE-1
 #define LOWER_SCREEN WIDTH*(HEIGHT-4)*2
+#define UPPER_SCREEN WIDTH*(HEIGHT-5)*2
 
 /* Pantalla */
 typedef struct screen_type {
