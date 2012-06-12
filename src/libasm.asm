@@ -90,6 +90,7 @@ _int_0C_hand:				; Handler de COM1
         push ax
         call int_0C
 
+		pop ax
         mov	al,20h			; Envio de EOI generico al PIC
 		out	20h,al
 		popa
@@ -169,6 +170,7 @@ _inb:
 
 	push dx
 	mov dx, [esp+12]
+	mov eax, 0
 	in al, dx
 
 ;	mov edx, [esp+8]

@@ -40,19 +40,19 @@ kmain() {
 
 	_Sti();
 
-	char *monitor = (char *) 0xb8000;
+//	char *monitor = (char *) 0xb8000;
+//
+//	monitor[LOWER_SCREEN] = 'p';
+//	monitor[LOWER_SCREEN + 1] = WHITE_TXT;
+//
+//	while (1) {
+//		if (received_serial == TRUE) {
+//			monitor[LOWER_SCREEN] = received_serial_char;
+//			monitor[LOWER_SCREEN + 1] = WHITE_TXT;
+//		}
+//	}
 
-	monitor[LOWER_SCREEN] = 'p';
-	monitor[LOWER_SCREEN + 1] = WHITE_TXT;
-
-	while (1) {
-		if (received_serial == TRUE) {
-			monitor[LOWER_SCREEN] = received_serial_char;
-			monitor[LOWER_SCREEN + 1] = WHITE_TXT;
-		}
-	}
-
-//	shell_mode();
+	shell_mode();
 
 }
 

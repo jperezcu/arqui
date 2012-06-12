@@ -11,7 +11,7 @@ void print_initial_prompt_lines();
 void add_to_shell_buffer(unsigned char c);
 void parse_command();
 void chat_mode();
-void print_on_main_screen(int cursor);
+void print_on_main_screen(char * buffer, int cursor);
 void send_departing_buffer(int cursor);
 int serial_received();
 char read_serial();

@@ -24,13 +24,13 @@ void shell_mode() {
 			parse_arriving_char(received_serial_char);
 		}
 
-		while ((c = getc()) == -1)
-			;
+		if ((c = getc()) != -1) {
 
-		if (current_vt == CHAT_VT) {
-			parse_departing_char(c);
-		} else {
-			parse_command_char(c);
+			if (current_vt == CHAT_VT) {
+				parse_departing_char(c);
+			} else {
+				parse_command_char(c);
+			}
 		}
 
 		refresh_screen();
@@ -45,7 +45,7 @@ void print_initial_prompt_lines() {
 	refresh_screen();
 }
 
-void print_on_main_screen(int cursor) {
+void print_on_main_screen(char * buffer, int cursor) {
 	int i;
 	int lines;
 	int aux;
@@ -63,7 +63,7 @@ void print_on_main_screen(int cursor) {
 		vt[current_vt].screen->cursor = LOWER_SCREEN - (2 * WIDTH * lines);
 	}
 	for (i = 0; i < cursor; i++) {
-		putc(departing_buffer[i]);
+		putc(buffer[i]);
 	}
 	putc('\n');
 
@@ -78,13 +78,15 @@ char read_serial() {
 }
 
 void parse_arriving_char(char arriving_char) {
-	if (arriving_char == '\n') {
-		print_on_main_screen(arriving_cursor);
+	if ((arriving_char == 12) || (arriving_char == 13)
+			|| (arriving_char == '\n')) {
+		print_on_main_screen(arriving_buffer, arriving_cursor);
 		arriving_cursor = 0;
 	} else {
 		arriving_buffer[arriving_cursor] = arriving_char;
 		arriving_cursor++;
 	}
+	received_serial = FALSE;
 }
 
 int is_transmit_empty() {
@@ -94,7 +96,7 @@ int is_transmit_empty() {
 void parse_departing_char(char c) {
 	switch (c) {
 	case '\n':
-		print_on_main_screen(departing_cursor);
+		print_on_main_screen(departing_buffer, departing_cursor);
 		clear_lower_screen();
 		departing_buffer[departing_cursor++] = c;
 		send_departing_buffer(departing_cursor);
@@ -118,15 +120,17 @@ void parse_departing_char(char c) {
 
 void send_departing_buffer(int cursor) {
 
-	while (is_transmit_empty() == 0)
-		;
-
 	int i = 0;
-	for (i = 0; i < cursor; i++) {
-		_Cli();
-		_outb(SERIAL_PORT, departing_buffer[i]); //no quiero ser interrumpido mientras escribo en el P.S
-		_Sti();
+
+	_Cli();
+	for (i = 0; i < cursor;) {
+		if (is_transmit_empty()) {
+			printf("transmit empty TRUE\n");
+			_outb(COM1, departing_buffer[i]); //no quiero ser interrumpido mientras escribo en el P.S
+			i++;
+		}
 	}
+	_Sti();
 }
 
 void parse_command_char(char c) {
@@ -175,10 +179,13 @@ void parse_command() {
 			printf("%s\n", input);
 		} else if (valid_entry && streq(command, "help")) {
 			printf("\nPruebe los siguientes comandos:\n\n");
-			printf("echo <mensaje> - imprime el mensaje en la terminal actual.\n\n");
+			printf(
+					"echo <mensaje> - imprime el mensaje en la terminal actual.\n\n");
 			printf("clear - borra el contenido de la terminal actual.\n\n");
-			printf("Cambie de terminal presionando ALT + 1 (o 2 o 3 o 4). \n\n");
-			printf("Entre al modo chat en la terminal 4 presionando ALT + 4.\n\n");
+			printf(
+					"Cambie de terminal presionando ALT + 1 (o 2 o 3 o 4). \n\n");
+			printf(
+					"Entre al modo chat en la terminal 4 presionando ALT + 4.\n\n");
 		} else if (valid_entry && streq(command, "clear")) {
 			clear();
 		} else {
