@@ -38,6 +38,7 @@ void shell_mode() {
 }
 
 void print_initial_prompt_lines() {
+	printf("Bienvenido a J2OS!\n");
 	for (; current_vt < 3; current_vt++) {
 		printf("guest@J2OS-terminal-%d:/$ ", current_vt + 1);
 	}
@@ -124,11 +125,11 @@ void send_departing_buffer(int cursor) {
 
 	_Cli();
 	for (i = 0; i < cursor;) {
-		if (is_transmit_empty()) {
-			printf("transmit empty TRUE\n");
+//		if (is_transmit_empty()) {
+//			printf("transmit empty TRUE\n");
 			_outb(COM1, departing_buffer[i]); //no quiero ser interrumpido mientras escribo en el P.S
 			i++;
-		}
+//		}
 	}
 	_Sti();
 }
@@ -183,9 +184,9 @@ void parse_command() {
 					"echo <mensaje> - imprime el mensaje en la terminal actual.\n\n");
 			printf("clear - borra el contenido de la terminal actual.\n\n");
 			printf(
-					"Cambie de terminal presionando ALT + 1 (o 2 o 3 o 4). \n\n");
+					"Cambie de terminal presionando ALT + 1 (o ALT + 2 o ALT + 3). \n\n");
 			printf(
-					"Entre al modo chat en la terminal 4 presionando ALT + 4.\n\n");
+					"Entre al modo chat presionando ALT + 4.\n\n");
 		} else if (valid_entry && streq(command, "clear")) {
 			clear();
 		} else {
