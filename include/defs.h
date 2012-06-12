@@ -47,7 +47,7 @@ typedef struct {
 } IDTR;
 
 /* Tama–o de keyboard->buffer */
-#define KEYBOARD_BUFFER_SIZE	16
+#define KEYBOARD_BUFFER_SIZE	256
 
 /* Teclado */
 typedef struct keyboard_type {
@@ -112,6 +112,13 @@ typedef struct key_type {
 #define F2			0x3c
 #define F3			0x3d
 #define F4			0x3e
+#define F11			0x57
+#define F12			0x58
+#define R_GUI			0x5B
+#define L_GUI			0x5C
+#define APPS			0x5D
+#define APPS2			0xE0
+#define SCROLL			0x46
 #define LEFT_SHIFT_PRESSED		0x2a
 #define LEFT_SHIFT_RELEASED	0xaa
 #define NUMLOCK		0x45
