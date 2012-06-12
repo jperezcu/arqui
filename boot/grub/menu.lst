@@ -1,5 +1,5 @@
 timeout 30
 default 0
 
-title CasKarOS
+title J2OS
 kernel /boot/kernel.bin
