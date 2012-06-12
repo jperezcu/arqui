@@ -102,7 +102,7 @@ typedef struct key_type {
 #define BACKSPACE		0x0d
 #define CAPSLOCK		0x3a
 #define CONTROL_PRESSED		0x1d
-#define CONTROL_RELEASED		0x9d
+#define CONTROL_RELEASED	0x9d
 #define DEAD_KEY		0x1a
 #define DELETE			0x53
 #define ENTER			0x1c
@@ -134,7 +134,8 @@ typedef struct key_type {
 #define SCREEN_SIZE WIDTH*HEIGHT*2
 #define LAST_LINE_BEGIN WIDTH*(HEIGHT-1)*2
 #define LAST_LINE_END SCREEN_SIZE-1
-#define LOWER_SCREEN WIDTH*(HEIGHT-4)*2
+#define LOWER_SCREEN WIDTH*(HEIGHT-1)*2
+#define LOWER_SCREEN2 WIDTH*(HEIGHT-4)*2
 #define UPPER_SCREEN WIDTH*(HEIGHT-5)*2
 
 /* Pantalla */
@@ -182,7 +183,7 @@ typedef struct vt_type {
 
 #define CHAT_VT 3
 
-#define CHAT_BUFFER_SIZE	200
+#define CHAT_BUFFER_SIZE	WIDTH-1
 
 #endif
 

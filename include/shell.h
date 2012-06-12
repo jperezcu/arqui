@@ -20,6 +20,7 @@ int is_transmit_empty();
 void parse_arriving_char(char c);
 void parse_departing_char(char c);
 void parse_command_char(char c);
+void send_departing_char(char departing_char);
 
 
 #endif

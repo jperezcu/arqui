@@ -75,9 +75,6 @@ void refresh_screen() {
 
 	char *monitor = (char *) 0xb8000;
 
-	monitor[SCREEN_SIZE - 2] = current_vt + '0';
-	monitor[SCREEN_SIZE - 1] = WHITE_TXT;
-
 	int i;
 	for (i = 0; i < SCREEN_SIZE - 2; i++) {
 		monitor[i] = vt[current_vt].screen->content[i];
@@ -96,7 +93,7 @@ void move_screen(int screen_size) {
 	for (i = 0, j = (WIDTH * 2); j < screen_size; i++, j++) {
 		screen->content[i] = screen->content[j];
 	}
-	while (i < SCREEN_SIZE) { 
+	while (i < screen_size) { 
 		screen->content[i++] = ' ';
 		screen->content[i++] = WHITE_TXT;
 	}

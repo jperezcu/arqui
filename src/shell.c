@@ -50,18 +50,10 @@ void print_on_main_screen(char * buffer, int cursor) {
 	int i;
 	int lines;
 	int aux;
-	lines = (cursor / WIDTH) + 1;
 	aux = vt[current_vt].screen->cursor + (lines * WIDTH * 2);
-	if (aux >= LOWER_SCREEN) {
-		aux = ((aux - LOWER_SCREEN) / (2 * WIDTH));
-		printf("%d", aux);
-
-	}
 	if (vt[current_vt].screen->cursor >= LOWER_SCREEN) {
-		for (i = 0; i < aux; i++) {
 			move_screen(LOWER_SCREEN);
-		}
-		vt[current_vt].screen->cursor = LOWER_SCREEN - (2 * WIDTH * lines);
+			vt[current_vt].screen->cursor = LOWER_SCREEN - (2 * WIDTH);
 	}
 	for (i = 0; i < cursor; i++) {
 		putc(buffer[i]);
@@ -83,10 +75,16 @@ void parse_arriving_char(char arriving_char) {
 			|| (arriving_char == '\n')) {
 		print_on_main_screen(arriving_buffer, arriving_cursor);
 		arriving_cursor = 0;
-	} else {
-		arriving_buffer[arriving_cursor] = arriving_char;
-		arriving_cursor++;
-	}
+	} else if(arriving_char =='\b'){
+		
+			if (arriving_cursor != 0) {
+				arriving_cursor--;
+			}
+		} else {
+			
+				arriving_buffer[arriving_cursor] = arriving_char;
+				arriving_cursor++;
+		}
 	received_serial = FALSE;
 }
 
@@ -94,7 +92,7 @@ int is_transmit_empty() {
 	return _inb(COM1 + 5) & 0x20;
 }
 
-void parse_departing_char(char c) {
+/*void parse_departing_char(char c) {
 	switch (c) {
 	case '\n':
 		print_on_main_screen(departing_buffer, departing_cursor);
@@ -117,20 +115,65 @@ void parse_departing_char(char c) {
 		}
 		break;
 	}
+}*/
+
+void parse_departing_char(char c) {
+	switch (c) {
+	case '\n':
+		print_on_main_screen(departing_buffer, departing_cursor);
+		clear_lower_screen();
+		//departing_buffer[departing_cursor++] = c;
+		//send_departing_char(c);
+		departing_cursor = 0;
+		break;
+	case '\b':
+		if (departing_cursor != 0) {
+			putc_lower_screen(c);
+			departing_cursor--;
+		}
+		break;
+	default:
+		 {
+			 if(departing_cursor<CHAT_BUFFER_SIZE){
+				putc_lower_screen(c);
+				departing_buffer[departing_cursor] = c;
+				departing_cursor++;
+			}
+		}
+		break;
+	}
+	if(departing_cursor<CHAT_BUFFER_SIZE){
+		send_departing_char(c);
+	}
 }
 
-void send_departing_buffer(int cursor) {
+/*void send_departing_buffer(int cursor) {
 
 	int i = 0;
 
-	_Cli();
+	//_Cli();
 	for (i = 0; i < cursor;) {
-//		if (is_transmit_empty()) {
-//			printf("transmit empty TRUE\n");
+		if (is_transmit_empty()) {
+			//printf("transmit empty TRUE\n");
 			_outb(COM1, departing_buffer[i]); //no quiero ser interrumpido mientras escribo en el P.S
 			i++;
-//		}
+		}
 	}
+	//_Sti();
+}*/
+
+void send_departing_char(char departing_char) {
+
+	//int i = 0;
+
+	_Cli();
+	//for (i = 0; i < cursor;) {
+		//if (is_transmit_empty()) {
+			//printf("transmit empty TRUE\n");
+			_outb(COM1, departing_char); //no quiero ser interrumpido mientras escribo en el P.S
+			//i++;
+		//}
+	//}
 	_Sti();
 }
 
@@ -190,7 +233,7 @@ void parse_command() {
 		} else if (valid_entry && streq(command, "clear")) {
 			clear();
 		} else {
-			printf("Invalid command.\n");
+			printf("Invalid command. Please use the command 'help' for more information.\n");
 		}
 	}
 
