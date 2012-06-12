@@ -42,29 +42,33 @@ struct key_type * parse_scancode(unsigned char c) {
 
 	switch (c) {
 	case CONTROL_PRESSED:
+	case ARROW_UP:
+	case ARROW_DOWN:
+	case ARROW_LEFT:
+	case ARROW_RIGHT:
+	case PAGE_UP:
+	case PAGE_DOWN:
+	case ESCAPE:
+		break;
+	case TABULAR:
+		keyboard.language = !keyboard.language;
 		break;
 	case CAPSLOCK:
 		keyboard.caps_state = !keyboard.caps_state;
 		break;
 	case LEFT_SHIFT_PRESSED:
 	case RIGHT_SHIFT_PRESSED:
-		if (keyboard.alt_state == TRUE) {
-			keyboard.language = !keyboard.language;
-		}
 	case LEFT_SHIFT_RELEASED:
 	case RIGHT_SHIFT_RELEASED:
 		keyboard.shift_state = !keyboard.shift_state;
 		break;
 	case ALT_PRESSED:
-		if (keyboard.shift_state == TRUE) {
-			keyboard.language = !keyboard.language;
-		}
 	case ALT_RELEASED:
 		keyboard.alt_state = !keyboard.alt_state;
 		break;
 	case DEAD_KEY:
 		if (keyboard.dead_key == TRUE) {
-			key->ascii = '«';
+			key->ascii = '`';
 			key->kind = ALPHANUM_KEY;
 			keyboard.dead_key = FALSE;
 		} else if (keyboard.language == SPANISH) {
@@ -76,9 +80,8 @@ struct key_type * parse_scancode(unsigned char c) {
 		if (c & 0x80) {
 			key->kind == HIDDEN_KEY;
 		} else if (keyboard.alt_state == TRUE && is_terminal_number(c)) {
-			change_terminal(c-2);
+			change_terminal(c - 2);
 		} else if (keyboard.dead_key == TRUE && is_vowel(c)) {
-// TODO hacer para mayusculas tambien
 			switch (c) {
 			case 0x12:
 				key->ascii = 0x82;

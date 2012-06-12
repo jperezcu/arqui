@@ -1,5 +1,5 @@
 timeout 7
 default 0
 
-title ChaviOS rc
+title J2OS rc
 kernel /boot/kernel.bin
